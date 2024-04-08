@@ -13,15 +13,17 @@ class Deezer {
     let q = ``;
 
     if (params.track_name) {
-      q += `track:"${params.track_name}"`;
+      // q += `track:"${params.track_name}"`;
+      q += `${params.track_name}`;
     }
     if (params.album_name) {
-      q += `album:"${params.album_name}"`;
+      // q += `album:"${params.album_name}"`;
+      q += ` ${params.album_name}`;
     }
     if (params.artist_name) {
-      q += `artist:"${params.artist_name}"`;
+      // q += `artist:"${params.artist_name}"`;
+      q += ` ${params.artist_name}`;
     }
-
     const response = await fetch(
       `https://api.deezer.com/search/${type}?q=${q}`
     );
