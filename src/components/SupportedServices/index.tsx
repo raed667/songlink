@@ -48,12 +48,12 @@ export const SupportedServices: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-2xl mt-4 px-4 md:px-0">
-      <h3 className="text-l font-semibold pb-2">supported services</h3>
+      <h2 className="text-l font-semibold pb-2">supported services</h2>
       <div className="flex flex-wrap gap-2 mt-2">
         {services.map((service) => (
           <div
             key={service.key}
-            tabIndex={service.soon ? 1 : 0}
+            tabIndex={service.soon ? undefined : 0}
             className={clsx(
               "bg-gray-100 p-2 rounded-md flex items-center gap-2",
               service.soon && "opacity-50",
