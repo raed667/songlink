@@ -10,6 +10,7 @@ import { SupportedServices } from "@/components/SupportedServices";
 import clsx from "clsx";
 import { CircleX } from "lucide-react";
 import { Counter } from "@/components/Counter";
+import { track } from "@vercel/analytics";
 
 const validate = async (
   link: string
@@ -42,13 +43,17 @@ export default function Home() {
       setIsLoading(true);
       setError(null);
 
+      track("Submit Link", { link });
+
       const { source, validation } = await validate(link);
 
       if (validation.isValid === false) throw new Error(validation.error);
       if (validation.isValid === true && source != null) {
+        track("Link valid", { link });
         router.push(`/${validation.type}/${source?.key}`);
       }
     } catch (error: any) {
+      track("Link Error", { link });
       setError(error.message);
       setIsLoading(false);
     }
