@@ -7,6 +7,8 @@ import { Track } from "@/util/services/type";
 import { services } from "@/components/SupportedServices";
 import { ServiceLogo } from "@/components/ServiceLogo";
 import { Preview } from "./preview";
+import { Share } from "@/components/Share";
+import { HomeLink } from "@/components/HomeLink";
 
 const fallbackCover = "/img/cover-fallback.png";
 
@@ -19,10 +21,15 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const key = params.key;
+  const track = (await getSourceItemByKey(key)) as Track | null;
+  if (!track) return { title: "404 - Track not found" };
 
   return {
-    title: "Track Page: " + key,
-    openGraph: {},
+    title: `${track.name} - ${track.artist} - Song link`,
+    openGraph: {
+      type: "music.song",
+      images: track.cover,
+    },
   };
 }
 
@@ -31,7 +38,7 @@ export default async function Page({ params }: Props) {
 
   if (!key) redirect("/404?source=track");
 
-  const track = (await getSourceItemByKey(key)) as Track;
+  const track = (await getSourceItemByKey(key)) as Track | null;
 
   if (!track) redirect("/404?source=track&key=" + key);
   const results = await findRelatedItems(track, "track", track.provider);
@@ -65,6 +72,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <main className="min-h-full sm:mx-auto max-w-2xl mt-2 md:mt-6 px-2">
+      <HomeLink />
       <Image
         className="rounded-md drop-shadow-md"
         src={cover}
@@ -101,6 +109,8 @@ export default async function Page({ params }: Props) {
           );
         })}
       </ol>
+
+      <Share />
     </main>
   );
 }

@@ -6,6 +6,8 @@ import Image from "next/image";
 
 import { ServiceLogo } from "@/components/ServiceLogo";
 import { services } from "@/components/SupportedServices";
+import { Share } from "@/components/Share";
+import { HomeLink } from "@/components/HomeLink";
 const fallbackCover = "/img/cover-fallback.png";
 
 type Props = {
@@ -17,10 +19,15 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const key = params.key;
+  const artist = await getSourceItemByKey(key);
+  if (!artist) return { title: "404 - Artist not found" };
 
   return {
-    title: "Artist Page: " + key,
-    openGraph: {},
+    title: `${artist.name} - Song link`,
+    openGraph: {
+      type: "music.album",
+      images: artist.cover,
+    },
   };
 }
 
@@ -61,6 +68,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <main className="min-h-full mx-auto max-w-2xl mt-2 md:mt-6 px-2">
+      <HomeLink />
       <Image
         className="rounded-md drop-shadow-md"
         src={cover}
@@ -92,6 +100,8 @@ export default async function Page({ params }: Props) {
           );
         })}
       </ol>
+
+      <Share />
     </main>
   );
 }

@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import { services } from "@/components/SupportedServices";
 import { ServiceLogo } from "@/components/ServiceLogo";
+import { Share } from "@/components/Share";
+import { HomeLink } from "@/components/HomeLink";
 
 const fallbackCover = "/img/cover-fallback.png";
 
@@ -18,10 +20,15 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const key = params.key;
+  const album = (await getSourceItemByKey(key)) as Album | null;
+  if (!album) return { title: "404 - Album not found" };
 
   return {
-    title: "Album Page: " + key,
-    openGraph: {},
+    title: `${album.name} - ${album?.artist} - Song link`,
+    openGraph: {
+      type: "music.album",
+      images: album.cover,
+    },
   };
 }
 
@@ -30,7 +37,7 @@ export default async function Page({ params }: Props) {
 
   if (!key) redirect("/404?source=album");
 
-  const album = (await getSourceItemByKey(key)) as Album;
+  const album = (await getSourceItemByKey(key)) as Album | null;
   if (!album) redirect("/404?source=album&key=" + key);
 
   const results = await findRelatedItems(album, "album", album.provider);
@@ -64,6 +71,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <main className="min-h-full mx-auto max-w-2xl mt-2 md:mt-6 px-2">
+      <HomeLink />
       <Image
         className="rounded-md drop-shadow-md"
         src={cover}
@@ -95,6 +103,8 @@ export default async function Page({ params }: Props) {
           );
         })}
       </ol>
+
+      <Share />
     </main>
   );
 }

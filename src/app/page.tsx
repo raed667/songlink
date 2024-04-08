@@ -9,6 +9,7 @@ import { Hero } from "@/components/Hero";
 import { SupportedServices } from "@/components/SupportedServices";
 import clsx from "clsx";
 import { CircleX } from "lucide-react";
+import { Counter } from "@/components/Counter";
 
 const validate = async (
   link: string
@@ -34,11 +35,6 @@ export default function Home() {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [validation, setValidation] = React.useState<LinkValidation | null>(
-    null
-  );
-
-  const [source, setSource] = React.useState<SearchResult | null>(null);
 
   const onSubmit = async (link: string) => {
     if (!link) return;
@@ -46,18 +42,14 @@ export default function Home() {
       setIsLoading(true);
       setError(null);
 
-      const { source: _source, validation: _validation } = await validate(link);
-      setValidation(_validation);
-      setSource(_source);
+      const { source, validation } = await validate(link);
 
-      if (_validation.isValid === false) throw new Error(_validation.error);
-
-      if (_validation.isValid === true && _source != null) {
-        router.push(`/${_validation.type}/${_source?.key}`);
+      if (validation.isValid === false) throw new Error(validation.error);
+      if (validation.isValid === true && source != null) {
+        router.push(`/${validation.type}/${source?.key}`);
       }
     } catch (error: any) {
       setError(error.message);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -87,6 +79,7 @@ export default function Home() {
       </div>
 
       <SupportedServices />
+      <Counter />
     </main>
   );
 }

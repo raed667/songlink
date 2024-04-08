@@ -30,7 +30,7 @@ export const LinkInput: React.FC<LinkInput> = ({ isLoading, onSubmit }) => {
         />
         <button
           className={clsx(
-            "rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-full md:w-20 mt-2 md:mt-0",
+            "rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-full md:w-20 mt-2 md:mt-0 min-w-[85px]",
             {
               "bg-indigo-600 hover:bg-indigo-500": !isLoading,
               "bg-gray-400 flex justify-center": isLoading,
@@ -40,7 +40,7 @@ export const LinkInput: React.FC<LinkInput> = ({ isLoading, onSubmit }) => {
           disabled={isLoading}
         >
           {isLoading ? (
-            <LoaderCircle className="animate-spin" />
+            <LoaderCircle size={21} className="animate-spin" />
           ) : (
             <span className="flex justify-center text-center">
               Share

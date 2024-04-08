@@ -13,7 +13,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Song Link",
-  description: "Share your songs",
+  description:
+    "Share your favorite music with your friends without worrying about which music streaming service they use",
 };
 
 export default function RootLayout({

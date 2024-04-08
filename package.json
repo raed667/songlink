@@ -17,8 +17,10 @@
     "lucide-react": "^0.365.0",
     "next": "14.1.4",
     "react": "^18",
+    "react-countup": "^6.5.3",
     "react-dom": "^18",
-    "react-modern-audio-player": "^1.4.0-rc.2"
+    "react-modern-audio-player": "^1.4.0-rc.2",
+    "react-share": "^5.1.0"
   },
   "devDependencies": {
     "@testing-library/react": "^14.2.2",
