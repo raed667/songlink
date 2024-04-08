@@ -48,6 +48,7 @@ export default function Home() {
       const { source, validation } = await validate(link);
 
       if (validation.isValid === false) throw new Error(validation.error);
+      if (source == null) throw new Error("Not found.");
       if (validation.isValid === true && source != null) {
         track("Link valid", { link });
         router.push(`/${validation.type}/${source?.key}`);
