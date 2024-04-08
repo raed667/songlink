@@ -55,7 +55,7 @@ export const SupportedServices: React.FC = () => {
             key={service.key}
             tabIndex={service.soon ? undefined : 0}
             className={clsx(
-              "bg-gray-100 p-2 rounded-md flex items-center gap-2",
+              "text-gray-900 bg-gray-100 p-2 rounded-md flex items-center gap-2",
               service.soon && "opacity-50",
               !service.soon && "cursor-pointer active:bg-gray-200"
             )}
