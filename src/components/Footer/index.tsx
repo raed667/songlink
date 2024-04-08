@@ -57,7 +57,7 @@ const navigation = [
 
 export function Footer() {
   return (
-    <footer className="fixed bottom-0 border-t bg-white border-gray-200 shadow w-full">
+    <footer className="border-t bg-white border-gray-200 shadow w-full">
       <div className="mx-auto max-w-7xl px-4 py-2 sm:flex sm:items-center sm:justify-between md:px-8">
         <div className="justify-center space-x-6 sm:order-2 hidden sm:flex">
           {navigation.map((item) => (

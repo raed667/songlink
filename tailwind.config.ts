@@ -7,9 +7,6 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    textColor: {
-      default: "#020617",
-    },
     extend: {
       fontSize: {
         "2xs": ".6875rem",

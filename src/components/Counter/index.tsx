@@ -26,7 +26,7 @@ export const Counter: React.FC = () => {
   }, [start, update]);
 
   return (
-    <div className="mx-auto max-w-2xl mt-8 flex justify-center text-gray-500 grayscale font-extralight">
+    <div className="mx-auto max-w-2xl mt-8 flex justify-center text-gray-800 grayscale font-light">
       <div ref={countUpRef} className="mr-2" />
       <span>good vibes shared 🎶</span>
     </div>

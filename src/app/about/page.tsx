@@ -1,3 +1,5 @@
+// import { Footer } from "@/components/Footer";
+
 export default function About() {
   return (
     <div className="p-4">
@@ -15,6 +17,7 @@ export default function About() {
           </p>
         </div>
       </div>
+      {/* <Footer /> */}
     </div>
   );
 }

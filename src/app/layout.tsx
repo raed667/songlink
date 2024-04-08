@@ -3,12 +3,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import React from "react";
 import clsx from "clsx";
-import { Footer } from "@/components/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -24,9 +22,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={clsx(inter.className, "h-full antialiased")}>
-      <body className="flex flex-col min-h-full">
-        {children}
-        <Footer />
+      <body className="h-full">
+        <div className="flex flex-col min-h-full">{children}</div>
       </body>
     </html>
   );

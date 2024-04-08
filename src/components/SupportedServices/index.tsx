@@ -55,7 +55,7 @@ export const SupportedServices: React.FC = () => {
             key={service.key}
             tabIndex={service.soon ? undefined : 0}
             className={clsx(
-              "text-gray-900 bg-gray-100 p-2 rounded-md flex items-center gap-2",
+              "text-gray-800 bg-gray-100 p-2 rounded-md flex items-center gap-2",
               service.soon && "opacity-50",
               !service.soon && "cursor-pointer active:bg-gray-200"
             )}
@@ -83,7 +83,7 @@ export const SupportedServices: React.FC = () => {
           </div>
         ))}
         <Link href="https://github.com/raed667/songlink/discussions">
-          <div className="bg-gray-100 h-full p-2 rounded-md flex items-center gap-2 cursor-pointer active:bg-gray-200">
+          <div className="text-gray-800 bg-gray-100 h-full p-2 rounded-md flex items-center gap-2 cursor-pointer active:bg-gray-200">
             <Plus /> Request a service
           </div>
         </Link>
