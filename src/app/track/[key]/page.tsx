@@ -77,7 +77,7 @@ export default async function Page({ params }: Props) {
         className="rounded-md drop-shadow-md"
         src={cover}
         alt={track.name}
-        width={400}
+        width={200}
         height={200}
       />
       <h1 className="mt-2 text-lg font-semibold">{track.name}</h1>
