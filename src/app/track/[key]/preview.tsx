@@ -17,7 +17,7 @@ export const PreviewAudio: React.FC<{ url: string }> = ({ url }) => {
 
   return (
     <div className="text-gray-400 mt-2">
-      <button onClick={onToggle}>
+      <button title="Preview" onClick={onToggle}>
         {isPlaying ? (
           <PauseCircle className="text-connect" />
         ) : (
