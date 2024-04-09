@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import React from "react";
 import clsx from "clsx";
 import { Analytics } from "@vercel/analytics/react";
+import { AxiomWebVitals } from "next-axiom";
 
 import "./globals.css";
 const inter = Inter({
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className="h-full">
         <div className="flex flex-col min-h-full">{children}</div>
         <Analytics />
+        <AxiomWebVitals />
       </body>
     </html>
   );

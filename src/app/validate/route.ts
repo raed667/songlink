@@ -4,13 +4,19 @@ import { SearchResult } from "@/util/services/type";
 import { validateLink } from "@/util/validators";
 import { LinkValidation } from "@/util/validators/type";
 import { NextResponse } from "next/server";
+import { withAxiom, AxiomRequest } from "next-axiom";
 
-export async function POST(request: Request) {
-  const body = await request.json();
+export const POST = withAxiom(async (req: AxiomRequest) => {
+  const body = await req.json();
   const { link } = body;
   if (!link) {
     return NextResponse.json({ error: "'link' is required" }, { status: 400 });
   }
+
+  req.log.info("validate link", {
+    link,
+  });
+
   const result: {
     validation: LinkValidation | null;
     source: SearchResult | null;
@@ -30,6 +36,10 @@ export async function POST(request: Request) {
       );
       result.source = source;
     } catch (error: any) {
+      req.log.error("validate link error", {
+        error,
+      });
+
       return NextResponse.json(
         { error: error.message ?? "Unexpected error occurred" },
         { status: 500 }
@@ -38,4 +48,4 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(result);
-}
+});

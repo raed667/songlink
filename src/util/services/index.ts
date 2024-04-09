@@ -5,6 +5,7 @@ import { Provider, ResourceType } from "../validators/type";
 import { isSupportedProvider, isSupportedType } from "../validators";
 import { SearchResult } from "./type";
 import { sql } from "@vercel/postgres";
+import { Logger } from "next-axiom";
 
 export const findSourceItem = async (
   id: string,
@@ -51,6 +52,8 @@ export const findRelatedItems = async (
   type: ResourceType,
   provider: Provider
 ) => {
+  const log = new Logger();
+  log.debug("finding related items", { source, type, provider });
   const promises = [];
   const searchParams = getSearchParams(source, type);
   const keys: Record<string, string> = {
@@ -93,6 +96,8 @@ export const findRelatedItems = async (
       if (cachedKeys && !cachedKeys[provider.toLowerCase()]) {
         await appendKey(cachedKeys.id, provider, key);
       }
+    } else {
+      log.error("Error finding related items", { result, type, searchParams });
     }
   });
   if (
@@ -101,11 +106,14 @@ export const findRelatedItems = async (
   ) {
     try {
       await saveRelatedKeys(keys);
-    } catch (e) {
-      console.error(`Error saving key relations`, e);
+    } catch (error) {
+      log.error("Error saving key relations", {
+        error,
+      });
+      console.error("Error saving key relations", error);
     }
   }
-
+  await log.flush();
   return results;
 };
 
