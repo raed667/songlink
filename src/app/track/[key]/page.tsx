@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Track } from "@/util/services/type";
 import { services } from "@/components/SupportedServices";
 import { ServiceLogo } from "@/components/ServiceLogo";
-import { Preview } from "./preview";
+import { PreviewAudio } from "./preview";
 import { Share } from "@/components/Share";
 import { HomeLink } from "@/components/HomeLink";
 
@@ -80,12 +80,19 @@ export default async function Page({ params }: Props) {
         width={200}
         height={200}
       />
-      <h1 className="mt-2 text-lg font-semibold">{track.name}</h1>
-      <h2 className="text-md font-semibold text-gray-800">
-        {track.artist} - {track.album}
-      </h2>
-
-      {track.preview_url && <Preview url={track.preview_url} />}
+      <div className="mt-2 ">
+        <h1 className="text-lg font-semibold flex items-center gap-2">
+          {track.preview_url && (
+            <div className="text-connect">
+              <PreviewAudio url={track.preview_url} />
+            </div>
+          )}
+          {track.name}
+        </h1>
+        <h2 className="text-md font-semibold text-gray-800">
+          {track.artist} - {track.album}
+        </h2>
+      </div>
 
       <ol>
         {links.map((link, i) => {

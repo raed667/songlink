@@ -12,5 +12,5 @@ export const ServiceLogo: React.FC<{ name: string; size?: number }> = ({
 
   if (!url) return null;
 
-  return <Image src={url} alt={name} width={size} height={size} className="" />;
+  return <Image src={url} alt={name} width={size} height={size} />;
 };

@@ -1,26 +1,36 @@
 "use client";
 
-import AudioPlayer from "react-modern-audio-player";
+import { PauseCircle, PlayCircle } from "lucide-react";
+import { useRef, useState } from "react";
 
-export const Preview: React.FC<{ url: string }> = ({ url }) => {
+export const PreviewAudio: React.FC<{ url: string }> = ({ url }) => {
+  const ref = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setPlaying] = useState(false);
+
+  const onToggle = () => {
+    if (ref.current?.paused) {
+      ref.current?.play();
+    } else {
+      ref.current?.pause();
+    }
+  };
+
   return (
-    <div className="rounded-md mt-2 mb-4">
-      <AudioPlayer
-        playList={[
-          {
-            id: 1,
-            src: url,
-          },
-        ]}
-        audioInitialState={{ volume: 1, curPlayId: 1, repeatType: "ONE" }}
-        activeUI={{
-          playButton: true,
-          progress: "waveform",
-        }}
-        rootContainerProps={{
-          colorScheme: "light",
-          scale: "medium",
-        }}
+    <div className="text-gray-400 mt-2">
+      <button onClick={onToggle}>
+        {isPlaying ? (
+          <PauseCircle className="text-connect" />
+        ) : (
+          <PlayCircle className="text-connect" />
+        )}
+      </button>
+      <audio
+        ref={ref}
+        src={url}
+        loop
+        preload="metadata"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
       />
     </div>
   );
