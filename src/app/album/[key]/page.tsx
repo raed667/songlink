@@ -25,9 +25,14 @@ export async function generateMetadata(
 
   return {
     title: `${album.name} - ${album?.artist} - Song link`,
+    description: `Listen to ${album.name} by ${
+      album?.artist ?? "🤷"
+    } on your favorite music service`,
+
     openGraph: {
       type: "music.album",
       images: album.cover,
+      url: `https://songlink.cc/album/${key}`,
     },
   };
 }
