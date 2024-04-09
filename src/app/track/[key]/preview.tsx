@@ -27,7 +27,6 @@ export const PreviewAudio: React.FC<{ url: string }> = ({ url }) => {
       <audio
         ref={ref}
         src={url}
-        loop
         preload="metadata"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
