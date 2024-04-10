@@ -24,15 +24,15 @@ export const services = [
     example: "https://www.deezer.com/us/track/14408104",
   },
   {
-    key: "youtubemusic",
-    name: "Youtube Music",
-    logo: "/img/logo/YoutubeMusic.svg",
-    soon: true,
-  },
-  {
     key: "Tidal",
     name: "Tidal",
     logo: "/img/logo/Tidal.svg",
+    example: "https://tidal.com/browse/track/101982419",
+  },
+  {
+    key: "youtubemusic",
+    name: "Youtube Music",
+    logo: "/img/logo/YoutubeMusic.svg",
     soon: true,
   },
 ];

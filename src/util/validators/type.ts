@@ -15,4 +15,4 @@ type LinkValidationFalse = {
 
 export type LinkValidation = LinkValidationTrue | LinkValidationFalse;
 
-export type Provider = "spotify" | "appleMusic" | "deezer";
+export type Provider = "spotify" | "appleMusic" | "deezer" | "tidal";

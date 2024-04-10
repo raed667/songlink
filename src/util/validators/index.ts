@@ -3,16 +3,18 @@ import { LinkValidation, Provider, ResourceType } from "./type";
 import spotify from "./spotify";
 import appleMusic from "./appleMusic";
 import deezer from "./deezer";
+import tidal from "./tidal";
 
-const providers = [spotify, appleMusic, deezer];
+const providers = [spotify, appleMusic, deezer, tidal];
 export const providersList: Provider[] = [
   "spotify",
   "appleMusic",
   "deezer",
+  "tidal",
 ] as const;
 
 export const isSupportedProvider = (provider: string): provider is Provider =>
-  ["spotify", "appleMusic", "deezer"].includes(provider);
+  ["spotify", "appleMusic", "deezer", "tidal"].includes(provider);
 
 export const isSupportedType = (type: string): type is ResourceType => {
   return type === "track" || type === "album" || type === "artist";

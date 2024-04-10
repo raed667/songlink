@@ -1,6 +1,7 @@
 import spotify from "./spotify";
 import deezer from "./deezer";
 import appleMusic from "./appleMusic";
+import tidal from "./tidal";
 import { Provider, ResourceType } from "../validators/type";
 import { isSupportedProvider, isSupportedType } from "../validators";
 import { SearchResult } from "./type";
@@ -19,6 +20,8 @@ export const findSourceItem = async (
       return deezer.getById(id, type);
     case "appleMusic":
       return appleMusic.getById(id, type);
+    case "tidal":
+      return tidal.getById(id, type);
     default:
       throw new Error(`Provider "${provider}" not supported`);
   }
@@ -87,6 +90,14 @@ export const findRelatedItems = async (
     }
   }
 
+  if (provider !== "tidal") {
+    if (cachedKeys["tidal"]) {
+      promises.push(getSourceItemByKey(cachedKeys["tidal"]));
+    } else {
+      promises.push(tidal.search(type, searchParams));
+    }
+  }
+
   const results = await Promise.allSettled(promises);
 
   results.forEach(async (result) => {
@@ -132,7 +143,7 @@ export const getSourceItemByKey = async (key: string) => {
 };
 
 const saveRelatedKeys = async (keys: Record<string, string>) => {
-  return sql`INSERT INTO relationship_cache (spotify, deezer, applemusic) VALUES (${keys.spotify}, ${keys.deezer}, ${keys.appleMusic})`;
+  return sql`INSERT INTO relationship_cache (spotify, deezer, applemusic, tidal) VALUES (${keys.spotify}, ${keys.deezer}, ${keys.appleMusic}, ${keys.tidal})`;
 };
 
 const isSavedRelationship = async (key: string, provider: Provider) => {
@@ -143,6 +154,8 @@ const isSavedRelationship = async (key: string, provider: Provider) => {
       return sql`SELECT * FROM relationship_cache WHERE spotify=${key};`;
     case "deezer":
       return sql`SELECT * FROM relationship_cache WHERE deezer=${key};`;
+    case "tidal":
+      return sql`SELECT * FROM relationship_cache WHERE tidal=${key};`;
     default:
       throw new Error(`Provider "${provider}" not supported`);
   }
@@ -156,5 +169,9 @@ const appendKey = async (id: string, provider: Provider, key: string) => {
       return sql`UPDATE relationship_cache SET spotify=${key} WHERE id=${id};`;
     case "deezer":
       return sql`UPDATE relationship_cache SET deezer=${key} WHERE id=${id};`;
+    case "tidal":
+      return sql`UPDATE relationship_cache SET tidal=${key} WHERE id=${id};`;
+    default:
+      throw new Error(`Provider "${provider}" not supported`);
   }
 };

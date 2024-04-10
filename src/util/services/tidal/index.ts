@@ -1,9 +1,10 @@
 import { kv } from "@vercel/kv";
 import { ResourceType } from "@/util/validators/type";
+
 import { SearchParams, SearchResult } from "../type";
 
-class Spotify {
-  public static _name: "spotify";
+class Tidal {
+  public static _name: "tidal";
 
   static async search(
     type: ResourceType,
@@ -16,39 +17,39 @@ class Spotify {
     if (params.track_name) query += params.track_name;
     if (params.artist_name) query += " " + params.artist_name;
     if (params.album_name) query += " " + params.album_name;
-    q.set("q", query);
-    q.set("type", type);
-    q.set("market", market);
+    q.set("query", query);
+    q.set("countryCode", market);
     q.set("limit", "1");
-    q.set("include_external", "audio");
 
     const response = await fetch(
-      `https://api.spotify.com/v1/search?${q.toString()}`,
+      `https://openapi.tidal.com/search?${q.toString()}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/vnd.tidal.v1+json",
         },
       }
     );
     const result = await response.json();
 
-    if (type === "artist" && result?.artists?.items.length > 0) {
-      const item = result.artists.items[0];
+    if (type === "artist" && result?.artists?.length > 0) {
+      const item = result.artists[0]?.resource;
       const key = this.getKey(item.id, "artist");
       const value = this.parseArtist(key, item);
       await kv.set(key, JSON.stringify(value));
       return value;
     }
 
-    if (type === "album" && result?.albums?.items?.length > 0) {
-      const item = result.albums.items[0];
+    if (type === "album" && result?.albums?.length > 0) {
+      const item = result.albums[0]?.resource;
       const key = this.getKey(item.id, "album");
       const value = this.parseAlbum(key, item);
       await kv.set(key, JSON.stringify(value));
       return value;
     }
-    if (type === "track" && result?.tracks?.items?.length > 0) {
-      const item = result.tracks.items[0];
+
+    if (type === "track" && result?.tracks?.length > 0) {
+      const item = result.tracks[0]?.resource;
       const key = this.getKey(item.id, "track");
       const value = this.parseTrack(key, item);
       await kv.set(key, JSON.stringify(value));
@@ -59,14 +60,14 @@ class Spotify {
   }
 
   private static async getAuthToken(): Promise<string> {
-    const token = await kv.get("spotify_access_token");
+    const token = await kv.get("tidal_access_token");
     if (token) return String(token);
 
-    const response = await fetch("https://accounts.spotify.com/api/token", {
+    const response = await fetch("https://auth.tidal.com/v1/oauth2/token", {
       method: "POST",
       headers: {
         Authorization: `Basic ${Buffer.from(
-          `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+          `${process.env.TIDAL_CLIENT_ID}:${process.env.TIDAL_CLIENT_SECRET}`
         ).toString("base64")}`,
       },
       body: new URLSearchParams({
@@ -75,19 +76,19 @@ class Spotify {
     });
     if (response.status !== 200) {
       const error = await response.text();
-      throw new Error("Failed to get Spotify token: " + error);
+      throw new Error("Failed to get tidal token: " + error);
     }
     const data = await response.json();
 
-    await kv.set("spotify_access_token", data.access_token, {
-      ex: data.expires_in,
+    await kv.set("tidal_access_token", data.access_token, {
+      ex: data.expires_in ?? 3600,
     });
 
-    return data.access_token as string;
+    return data.access_token;
   }
 
   static getKey(id: string, type: ResourceType) {
-    return `spotify_${type}_${id}`;
+    return `tidal_${type}_${id}`;
   }
 
   static async getById(
@@ -102,7 +103,7 @@ class Spotify {
       return { ...cached, cache: true } as SearchResult;
     }
 
-    const resource = await Spotify._getById(id, type, market);
+    const resource = await Tidal._getById(id, type, market);
     if (resource === null) return null;
 
     await kv.set(key, JSON.stringify(resource));
@@ -114,10 +115,10 @@ class Spotify {
     return {
       key,
       id: item.id,
-      provider: "spotify",
+      provider: "tidal",
       name: item.name,
-      link: item.external_urls.spotify,
-      cover: item.images[0]?.url,
+      link: item.tidalUrl,
+      cover: item.picture[0]?.url,
     };
   }
 
@@ -125,10 +126,10 @@ class Spotify {
     return {
       key,
       id: item.id,
-      provider: "spotify",
-      name: item.name,
-      link: item.external_urls.spotify,
-      cover: item.images[0]?.url,
+      provider: "tidal",
+      name: item.title,
+      link: item.tidalUrl,
+      cover: item.imageCover[0]?.url,
       artist: item.artists[0].name,
     };
   }
@@ -137,13 +138,12 @@ class Spotify {
     return {
       key,
       id: item.id,
-      provider: "spotify",
-      name: item.name,
-      link: item.external_urls.spotify,
-      cover: item.album.images[0]?.url,
+      provider: "tidal",
+      name: item.title,
+      link: item.tidalUrl,
+      cover: item.album.imageCover[0]?.url,
       artist: item.artists[0].name,
-      album: item.album.name,
-      preview_url: item.preview_url,
+      album: item.album.title,
     };
   }
 
@@ -153,31 +153,38 @@ class Spotify {
     market = "US"
   ): Promise<SearchResult | null> {
     const token = await this.getAuthToken();
+
     const response = await fetch(
-      `https://api.spotify.com/v1/${type}s/${id}?market=${market}`,
+      `https://openapi.tidal.com/${type}s/${id}?countryCode=${market}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/vnd.tidal.v1+json",
         },
       }
     );
-    const key = this.getKey(id, type);
 
     const data = await response.json();
-    if (type === "artist" && data.type === "artist") {
-      return this.parseArtist(key, data);
+    const key = this.getKey(id, type);
+
+    if (
+      type === "artist" &&
+      data.resource.name &&
+      !data.resource.artifactType
+    ) {
+      return this.parseArtist(key, data.resource);
     }
 
-    if (type === "album" && data.type === "album") {
-      return this.parseAlbum(key, data);
+    if (type === "album" && data.resource.type === "ALBUM") {
+      return this.parseAlbum(key, data.resource);
     }
 
-    if (type === "track" && data.type === "track") {
-      return this.parseTrack(key, data);
+    if (type === "track" && data.resource.artifactType === "track") {
+      return this.parseTrack(key, data.resource);
     }
 
     return null;
   }
 }
 
-export default Spotify;
+export default Tidal;
