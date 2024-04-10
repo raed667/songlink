@@ -34,6 +34,12 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
         validation.type,
         validation.provider
       );
+      if (!source) {
+        return NextResponse.json(
+          { error: "Sorry, we didn't find the item you're looking for." },
+          { status: 404 }
+        );
+      }
       result.source = source;
     } catch (error: any) {
       req.log.error("validate link error", {
