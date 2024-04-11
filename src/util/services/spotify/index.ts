@@ -1,11 +1,19 @@
 import { kv } from "@vercel/kv";
 import { ResourceType } from "@/util/validators/type";
+import { backOff } from "exponential-backoff";
 import { SearchParams, SearchResult } from "../type";
 
 class Spotify {
   public static _name: "spotify";
 
-  static async search(
+  static async search(type: ResourceType, params: SearchParams, market = "US") {
+    return await backOff(() => Spotify._search(type, params, market), {
+      numOfAttempts: 5,
+      maxDelay: 3500,
+    });
+  }
+
+  static async _search(
     type: ResourceType,
     params: SearchParams,
     market = "US"
@@ -102,7 +110,10 @@ class Spotify {
       return { ...cached, cache: true } as SearchResult;
     }
 
-    const resource = await Spotify._getById(id, type, market);
+    const resource = await backOff(() => Spotify._getById(id, type, market), {
+      maxDelay: 3500,
+      numOfAttempts: 5,
+    });
     if (resource === null) return null;
 
     await kv.set(key, JSON.stringify(resource));

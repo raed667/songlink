@@ -71,7 +71,7 @@ class AppleMusicValidator {
     return type === "album" || type === "song" || type === "artist";
   }
 
-  private static extractResourceType(url: string): ResourceType {
+  private static extractResourceType(url: string): ResourceType | "" {
     const path = new URL(url).pathname;
     const parts = path.split("/") as ResourceType[];
 
@@ -83,7 +83,7 @@ class AppleMusicValidator {
       return parts[2];
     }
 
-    throw new Error("Unable to extract resource type");
+    return parts[2];
   }
 
   private static extractResourceId(url: string): string {
