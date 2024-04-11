@@ -23,7 +23,8 @@
     "react-countup": "^6.5.3",
     "react-dom": "^18",
     "react-share": "^5.1.0",
-    "tidal-music": "^0.0.9"
+    "tidal-music": "^0.0.9",
+    "ytmusic-api": "^5.2.1"
   },
   "devDependencies": {
     "@testing-library/react": "^14.2.2",

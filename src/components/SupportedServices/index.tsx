@@ -33,7 +33,8 @@ export const services = [
     key: "youtubemusic",
     name: "Youtube Music",
     logo: "/img/logo/YoutubeMusic.svg",
-    soon: true,
+    example: "https://music.youtube.com/watch?v=lYBUbBu4W08",
+    soon: false,
   },
 ];
 
