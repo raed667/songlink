@@ -1,6 +1,6 @@
 import React from "react";
-import { services } from "../SupportedServices";
 import Image from "next/image";
+import { services } from "../SupportedServices";
 
 export const ServiceLogo: React.FC<{ name: string; size?: number }> = ({
   name,

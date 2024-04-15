@@ -1,7 +1,7 @@
-import { expect, it, describe } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import SpotifyValidator from ".";
 import { NOT_VALID_LINK } from "../common";
+import SpotifyValidator from ".";
 
 describe("Spotify URL validator", () => {
   it.each(["track", "album", "artist"])(

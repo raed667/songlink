@@ -1,7 +1,7 @@
 // import { Footer } from "@/components/Footer";
 
-import { ChevronRightIcon, HomeIcon } from "lucide-react";
 import Link from "next/link";
+import { ChevronRightIcon, HomeIcon } from "lucide-react";
 
 export default function About() {
   return (
@@ -63,12 +63,18 @@ export default function About() {
           </p>
           <p>
             I use Vercel for hosting and analytics. You can read their{" "}
-            <a href="https://vercel.com/docs/analytics/privacy-policy">
+            <a
+              className="text-indigo-600"
+              href="https://vercel.com/docs/analytics/privacy-policy"
+            >
               privacy policy
             </a>
             .
-            <br />I use axiom.co for error logging. You can read their
-            <a href="https://axiom.co/privacy">privacy policy</a>.
+            <br />I use axiom.co for error logging. You can read their{" "}
+            <a className="text-indigo-600" href="https://axiom.co/privacy">
+              privacy policy
+            </a>
+            .
           </p>
         </div>
       </div>

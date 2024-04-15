@@ -1,16 +1,16 @@
 "use client";
 
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import clsx from "clsx";
+import { CircleX } from "lucide-react";
+import { track } from "@vercel/analytics";
 import { LinkInput } from "@/components/LinkInput";
 import { LinkValidation } from "@/util/validators/type";
-import React from "react";
-import { useRouter } from "next/navigation";
 import { SearchResult } from "@/util/services/type";
 import { Hero } from "@/components/Hero";
 import { SupportedServices } from "@/components/SupportedServices";
-import clsx from "clsx";
-import { CircleX } from "lucide-react";
 import { Counter } from "@/components/Counter";
-import { track } from "@vercel/analytics";
 
 const validate = async (
   link: string
@@ -64,7 +64,7 @@ export default function Home() {
     <main>
       <Hero
         announcement={{
-          title: "song link is open-source",
+          title: "SongLink.cc is open-source",
           href: "https://github.com/raed667/songlink",
           linkText: "Github",
         }}

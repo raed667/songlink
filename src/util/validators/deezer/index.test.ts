@@ -1,7 +1,7 @@
-import { expect, it, describe } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import DeezerValidator from ".";
 import { NOT_VALID_LINK } from "../common";
+import DeezerValidator from ".";
 
 describe("Deezer URL validator", () => {
   it.each(["track", "album", "artist"])(

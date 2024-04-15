@@ -1,7 +1,7 @@
-import { expect, it, describe } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import AppleMusicValidator from ".";
 import { NOT_VALID_LINK } from "../common";
+import AppleMusicValidator from ".";
 
 describe("Apple Music URL validator", () => {
   it.each(["song", "album", "artist"])(

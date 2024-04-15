@@ -1,8 +1,8 @@
 "use server";
-import { findRelatedItems, getSourceItemByKey } from "@/util/services";
 import type { Metadata, ResolvingMetadata } from "next";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { findRelatedItems, getSourceItemByKey } from "@/util/services";
 
 import { ServiceLogo } from "@/components/ServiceLogo";
 import { services } from "@/components/SupportedServices";

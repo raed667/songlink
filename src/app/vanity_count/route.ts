@@ -1,6 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
-import { withAxiom, AxiomRequest } from "next-axiom";
+import { AxiomRequest, withAxiom } from "next-axiom";
 
 export const GET = withAxiom(async (req: AxiomRequest) => {
   try {

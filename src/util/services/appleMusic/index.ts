@@ -1,19 +1,23 @@
-import { kv } from "@vercel/kv";
-import { ResourceType } from "@/util/validators/type";
 import { backOff } from "exponential-backoff";
+import { kv } from "@vercel/kv";
 import { SearchParams, SearchResult } from "../type";
+import { ResourceType } from "@/util/validators/type";
 
 class AppleMusic {
   public static _name: "appleMusic";
 
-  static async search(type: ResourceType, params: SearchParams, market = "US") {
+  public static async search(
+    type: ResourceType,
+    params: SearchParams,
+    market = "US"
+  ) {
     return await backOff(() => AppleMusic._search(type, params, market), {
       numOfAttempts: 5,
       maxDelay: 3500,
     });
   }
 
-  static async _search(
+  private static async _search(
     type: ResourceType,
     params: SearchParams,
     market = "US"
@@ -42,7 +46,7 @@ class AppleMusic {
     return null; // should never happen
   }
 
-  static async search_track(
+  private static async search_track(
     track_name: string,
     artist_name: string,
     album_name: string,
@@ -67,7 +71,7 @@ class AppleMusic {
     return value;
   }
 
-  static async search_album(
+  private static async search_album(
     artist_name: string,
     album_name: string,
     market = "US"
@@ -92,7 +96,7 @@ class AppleMusic {
     return value;
   }
 
-  static async search_artist(
+  private static async search_artist(
     artist_name: string,
     market = "US"
   ): Promise<SearchResult | null> {
@@ -116,11 +120,11 @@ class AppleMusic {
     return value;
   }
 
-  static getKey(id: string, type: ResourceType) {
+  private static getKey(id: string, type: ResourceType) {
     return `appleMusic_${type}_${id}`;
   }
 
-  static async getById(
+  public static async getById(
     id: string,
     type: ResourceType,
     market = "FR"

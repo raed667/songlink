@@ -1,13 +1,14 @@
 "use server";
+import Image from "next/image";
+import { redirect } from "next/navigation";
+import type { Metadata, ResolvingMetadata } from "next";
 import { findRelatedItems, getSourceItemByKey } from "@/util/services";
 import { Album } from "@/util/services/type";
-import type { Metadata, ResolvingMetadata } from "next";
-import { redirect } from "next/navigation";
-import Image from "next/image";
 import { services } from "@/components/SupportedServices";
-import { ServiceLogo } from "@/components/ServiceLogo";
 import { Share } from "@/components/Share";
+import { ServiceLogo } from "@/components/ServiceLogo";
 import { HomeLink } from "@/components/HomeLink";
+
 
 const fallbackCover = "/img/cover-fallback.png";
 
