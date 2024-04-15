@@ -87,9 +87,11 @@ class Spotify {
     }
     const data = await response.json();
 
-    await kv.set("spotify_access_token", data.access_token, {
-      ex: data.expires_in,
-    });
+    await kv.setex(
+      "spotify_access_token",
+      data.expires_in - 1,
+      data.access_token
+    );
 
     return data.access_token as string;
   }
