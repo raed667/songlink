@@ -24,11 +24,13 @@ export async function generateMetadata(
   const track = (await getSourceItemByKey(key)) as Track | null;
   if (!track) return { title: "404 - Track not found" };
 
+  let description = `Listen to ${track.name}`;
+  if (track.artist) description += ` by ${track.artist}`;
+  description += " on your favorite music service";
+
   return {
-    title: `${track.name} - ${track.artist} - Song link`,
-    description: `Listen to ${track.name} by ${
-      track?.artist ?? "🤷"
-    } on your favorite music service`,
+    title: `${track.name} - ${track.artist}`,
+    description,
 
     openGraph: {
       type: "music.song",

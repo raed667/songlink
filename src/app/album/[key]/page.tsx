@@ -9,7 +9,6 @@ import { Share } from "@/components/Share";
 import { ServiceLogo } from "@/components/ServiceLogo";
 import { HomeLink } from "@/components/HomeLink";
 
-
 const fallbackCover = "/img/cover-fallback.png";
 
 type Props = {
@@ -24,11 +23,13 @@ export async function generateMetadata(
   const album = (await getSourceItemByKey(key)) as Album | null;
   if (!album) return { title: "404 - Album not found" };
 
+  let description = `Listen to ${album.name}`;
+  if (album.artist) description += ` by ${album.artist}`;
+  description += " on your favorite music service";
+
   return {
-    title: `${album.name} - ${album?.artist} - Song link`,
-    description: `Listen to ${album.name} by ${
-      album?.artist ?? "🤷"
-    } on your favorite music service`,
+    title: `${album.name} - ${album?.artist}`,
+    description,
 
     openGraph: {
       type: "music.album",

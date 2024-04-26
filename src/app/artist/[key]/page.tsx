@@ -23,7 +23,7 @@ export async function generateMetadata(
   if (!artist) return { title: "404 - Artist not found" };
 
   return {
-    title: `${artist.name} - Song link`,
+    title: `${artist.name}`,
     description: `Listen to ${artist.name} on your favorite music service`,
     openGraph: {
       type: "music.album",
