@@ -5,6 +5,7 @@ import { LinkInput } from "@/components/LinkInput";
 import { Hero } from "@/components/Hero";
 import { SupportedServices } from "@/components/SupportedServices";
 import { Counter } from "@/components/Counter";
+import { NewSongs } from "@/components/NewSongs";
 
 export default function Home() {
   return (
@@ -21,6 +22,9 @@ export default function Home() {
 
       <SupportedServices />
       <Counter />
+      <div className="mt-8 mx-auto">
+        <NewSongs />
+      </div>
     </main>
   );
 }
