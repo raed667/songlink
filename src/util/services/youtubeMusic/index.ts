@@ -155,7 +155,6 @@ class YoutubeMusic {
 
     if (resource === "track") {
       const item = await api.getSong(id);
-      console.log(item);
       return this.parseTrack(key, item);
     }
 

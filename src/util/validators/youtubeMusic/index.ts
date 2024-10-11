@@ -1,7 +1,7 @@
 import { NOT_VALID_LINK } from "../common";
 import { LinkValidation } from "../type";
 
-type ResourceType = "track" | "artist" | "playlist";
+type ResourceType = "track" | "artist" | "album";
 
 class YoutubeMusicValidator {
   static async validate(url: string): Promise<LinkValidation> {
@@ -22,7 +22,6 @@ class YoutubeMusicValidator {
       }
 
       const type = YoutubeMusicValidator.extractResourceType(url);
-      console.log(type);
       if (!YoutubeMusicValidator.isSupportedType(type)) {
         return {
           isValid: false,
@@ -45,7 +44,7 @@ class YoutubeMusicValidator {
   }
 
   private static isSupportedType(type: string): type is "track" | "artist" {
-    return type === "track" || type === "artist";
+    return type === "track" || type === "artist"; // todo support albums
   }
 
   private static extractResourceType(url: string): ResourceType {
@@ -54,7 +53,7 @@ class YoutubeMusicValidator {
 
     if (parts[1] === "channel") return "artist";
 
-    if (parts[1] === "playlist") return "playlist";
+    if (parts[1] === "playlist") return "album";
 
     if (parts[1] === "watch") return "track";
 
@@ -67,9 +66,9 @@ class YoutubeMusicValidator {
 
     const resourceType = YoutubeMusicValidator.extractResourceType(url);
 
-    // if (resourceType === "album" && searchParams.get("list")) {
-    //   return searchParams.get("list") as string;
-    // }
+    if (resourceType === "album" && searchParams.get("list")) {
+      return searchParams.get("list") as string;
+    }
 
     if (resourceType === "track" && searchParams.get("v")) {
       return searchParams.get("v") as string;

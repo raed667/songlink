@@ -1,5 +1,5 @@
 import { sql } from "@vercel/postgres";
-import { Logger } from "next-axiom";
+import { log, Logger } from "next-axiom";
 import { Provider, ResourceType } from "../validators/type";
 import { isSupportedProvider, isSupportedType } from "../validators";
 import spotify from "./spotify";
@@ -8,6 +8,9 @@ import appleMusic from "./appleMusic";
 import tidal from "./tidal";
 import youtubeMusic from "./youtubeMusic";
 import { SearchResult } from "./type";
+import { cleanTitle } from "./helpers/clean";
+
+export const maxDuration = 60;
 
 export const findSourceItem = async (
   id: string,
@@ -43,7 +46,7 @@ const getSearchParams = (
   }
   if (type === "track") {
     return {
-      track_name: source.name,
+      track_name: cleanTitle(source.name),
       // @ts-expect-error: TODO fix later
       artist_name: source.artist,
       // @ts-expect-error: TODO fix later

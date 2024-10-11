@@ -106,12 +106,16 @@ class Spotify {
     market = "US"
   ): Promise<SearchResult | null> {
     const key = this.getKey(id, type);
-    const cached = await kv.get(key);
-    if (cached) {
-      // TODO validate cache
-      return { ...cached, cache: true } as SearchResult;
+    try {
+      const cached = await kv.get(key);
+      if (cached) {
+        // TODO validate cache
+        return { ...cached, cache: true } as SearchResult;
+      }
+    } catch (e) {
+      console.log("CACHE ERROR", e);
     }
-
+    console.log("SPOTIFY getById", { id, type, market });
     const resource = await backOff(() => Spotify._getById(id, type, market), {
       maxDelay: 3500,
       numOfAttempts: 5,
@@ -166,6 +170,8 @@ class Spotify {
     market = "US"
   ): Promise<SearchResult | null> {
     const token = await this.getAuthToken();
+    const key = this.getKey(id, type);
+
     const response = await fetch(
       `https://api.spotify.com/v1/${type}s/${id}?market=${market}`,
       {
@@ -174,7 +180,6 @@ class Spotify {
         },
       }
     );
-    const key = this.getKey(id, type);
 
     const data = await response.json();
     if (type === "artist" && data.type === "artist") {

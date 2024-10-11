@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import { PreviewAudio } from "./preview";
 import { findRelatedItems, getSourceItemByKey } from "@/util/services";
-import { Track } from "@/util/services/type";
+import { Artist, Track } from "@/util/services/type";
 import { services } from "@/components/SupportedServices";
 import { ServiceLogo } from "@/components/ServiceLogo";
 import { Share } from "@/components/Share";
@@ -49,23 +49,27 @@ export default async function Page({ params }: Props) {
 
   if (!track) redirect("/404?source=track&key=" + key);
   const results = await findRelatedItems(track, "track", track.provider);
+  const items = results
+    .filter((res) => res.status === "fulfilled")
+    .map((res) => (res.status === "fulfilled" ? res.value : null))
+    .filter(Boolean) as Track[];
 
+  const spotifyTrack = items.find((res) => res?.provider === "spotify");
+  const appleTrack = items.find((res) => res?.provider === "appleMusic");
+
+  const name = spotifyTrack?.name ?? appleTrack?.name ?? track.name;
+  const album = spotifyTrack?.album ?? appleTrack?.album ?? track.album;
+  const artist = spotifyTrack?.artist ?? appleTrack?.artist ?? track.artist;
   const cover =
-    track.cover ??
-    results
-      .map((res) => {
-        if (res.status === "fulfilled") return res?.value?.cover;
-      })
-      .find(Boolean) ??
-    fallbackCover;
+    spotifyTrack?.cover ?? appleTrack?.cover ?? track.cover ?? fallbackCover;
 
-  const links = results
+  const links = items
     .map((res) => {
-      if (res.status === "fulfilled" && res.value) {
+      if (res) {
         return {
-          provider: res.value.provider,
-          link: res.value.link,
-          name: res.value.name,
+          provider: res.provider,
+          link: res.link,
+          name: res.name,
         };
       }
     })
@@ -83,7 +87,7 @@ export default async function Page({ params }: Props) {
       <Image
         className="rounded-md drop-shadow-md"
         src={cover}
-        alt={track.name}
+        alt={name}
         width={200}
         height={200}
       />
@@ -94,10 +98,10 @@ export default async function Page({ params }: Props) {
               <PreviewAudio url={track.preview_url} />
             </div>
           )}
-          {track.name}
+          {name}
         </h1>
         <h2 className="text-md font-semibold text-gray-800">
-          {track.artist} - {track.album}
+          {track.artist} {album && `- ${album}`}
         </h2>
       </div>
 
@@ -117,7 +121,7 @@ export default async function Page({ params }: Props) {
             >
               <ServiceLogo name={link.provider} />
               <a href={link.link}>
-                Listen to {track.name} by {track.artist} on {name}
+                Listen to {name} by {artist} on {name}
               </a>
             </li>
           );

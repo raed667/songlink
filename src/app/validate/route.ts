@@ -5,6 +5,8 @@ import { SearchResult } from "@/util/services/type";
 import { validateLink } from "@/util/validators";
 import { LinkValidation } from "@/util/validators/type";
 
+export const maxDuration = 60;
+
 export const POST = withAxiom(async (req: AxiomRequest) => {
   const body = await req.json();
   const { link } = body;

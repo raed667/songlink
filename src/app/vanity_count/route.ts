@@ -2,6 +2,8 @@ import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 import { AxiomRequest, withAxiom } from "next-axiom";
 
+export const maxDuration = 60;
+
 export const GET = withAxiom(async (req: AxiomRequest) => {
   try {
     const { rows } = await sql`SELECT COUNT(id) FROM relationship_cache`;

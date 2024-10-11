@@ -1,46 +1,11 @@
 "use client";
-import { useRouter } from "next/navigation";
+
+import { useFormStatus } from "react-dom";
 import clsx from "clsx";
-import { ChevronRight, LoaderCircle, CircleX } from "lucide-react";
-import { useFormStatus, useFormState } from "react-dom";
-import { submitLink } from "@/app/actions";
+import { ChevronRight, LoaderCircle } from "lucide-react";
 
-export const LinkInput: React.FC = () => {
-  const [state, formAction] = useFormState(submitLink, {
-    errorMessage: "",
-  });
-  const router = useRouter();
-
-  if (state.type && state.key) {
-    router.push(`/${state.type}/${state?.key}`);
-  }
-
-  return (
-    <>
-      <div className="mt-4 flex items-center justify-center mx-4">
-        <form
-          action={formAction}
-          className="md:min-w-96 md:w-1/2 w-full md:flex items-center justify-center gap-2"
-        >
-          <InnerForm />
-        </form>
-      </div>
-      <div
-        className={clsx(
-          "text-center mt-4 mx-auto max-w-2xl text-red-500 h-[2rem] font-semibold",
-          {
-            invisible: !state.errorMessage,
-          }
-        )}
-      >
-        {state.errorMessage && <CircleX className="inline mr-2" />}
-        {state.errorMessage}
-      </div>
-    </>
-  );
-};
-
-const InnerForm: React.FC = () => {
+export const Inner: React.FC = () => {
+  "use client";
   const { pending } = useFormStatus();
 
   return (
