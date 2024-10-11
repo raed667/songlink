@@ -8,7 +8,7 @@ export const maxDuration = 60;
 export const GET = withAxiom(async (req: AxiomRequest) => {
   try {
     const { rows } =
-      await sql`SELECT * FROM relationship_cache ORDER BY created_at DESC LIMIT 50;`;
+      await sql`SELECT * FROM relationship_cache WHERE spotify LIKE '%track%' OR deezer LIKE '%track%' OR applemusic LIKE '%track%' OR tidal LIKE '%track%' OR youtubemusic LIKE '%track%' ORDER BY created_at DESC LIMIT 50;`;
 
     const tracks = [];
 
