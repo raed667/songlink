@@ -2,6 +2,7 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { cache } from "react";
 import { findRelatedItems, getSourceItemByKey } from "@/util/services";
 
 import { ServiceLogo } from "@/components/ServiceLogo";
@@ -9,6 +10,10 @@ import { services } from "@/components/SupportedServices";
 import { Share } from "@/components/Share";
 import { HomeLink } from "@/components/HomeLink";
 const fallbackCover = "/img/cover-fallback.png";
+
+const getSourceItem = cache(async (key: string) => {
+  return await getSourceItemByKey(key);
+});
 
 type Props = {
   params: { key: string };
@@ -19,7 +24,7 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const key = params.key;
-  const artist = await getSourceItemByKey(key);
+  const artist = await getSourceItem(key);
   if (!artist) return { title: "404 - Artist not found" };
 
   return {
@@ -37,7 +42,7 @@ export default async function Page({ params }: Props) {
   const key = params.key;
 
   if (!key) redirect("/404?source=artist");
-  const artist = await getSourceItemByKey(key);
+  const artist = await getSourceItem(key);
   if (!artist) redirect("/404?source=artist&key=" + key);
   const results = await findRelatedItems(artist, "artist", artist.provider);
 

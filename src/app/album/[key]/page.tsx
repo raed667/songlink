@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import type { Metadata, ResolvingMetadata } from "next";
+import { cache } from "react";
 import { findRelatedItems, getSourceItemByKey } from "@/util/services";
 import { Album } from "@/util/services/type";
 import { services } from "@/components/SupportedServices";
@@ -10,6 +11,10 @@ import { ServiceLogo } from "@/components/ServiceLogo";
 import { HomeLink } from "@/components/HomeLink";
 
 const fallbackCover = "/img/cover-fallback.png";
+
+const getSourceItem = cache(async (key: string) => {
+  return (await getSourceItemByKey(key)) as Album | null;
+});
 
 type Props = {
   params: { key: string };
@@ -20,12 +25,23 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const key = params.key;
-  const album = (await getSourceItemByKey(key)) as Album | null;
+  const album = await getSourceItem(key);
   if (!album) return { title: "404 - Album not found" };
 
   let description = `Listen to ${album.name}`;
   if (album.artist) description += ` by ${album.artist}`;
   description += " on your favorite music service";
+
+  const results = await findRelatedItems(album, "album", album.provider);
+
+  const cover =
+    album.cover ??
+    results
+      .map((res) => {
+        if (res.status === "fulfilled") return res?.value?.cover;
+      })
+      .find(Boolean) ??
+    fallbackCover;
 
   return {
     title: `${album.name} - ${album?.artist}`,
@@ -33,7 +49,7 @@ export async function generateMetadata(
 
     openGraph: {
       type: "music.album",
-      images: album.cover,
+      images: cover,
       url: `https://songlink.cc/album/${key}`,
     },
   };
@@ -44,7 +60,7 @@ export default async function Page({ params }: Props) {
 
   if (!key) redirect("/404?source=album");
 
-  const album = (await getSourceItemByKey(key)) as Album | null;
+  const album = await getSourceItem(key);
   if (!album) redirect("/404?source=album&key=" + key);
 
   const results = await findRelatedItems(album, "album", album.provider);

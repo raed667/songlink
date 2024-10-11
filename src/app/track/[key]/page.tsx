@@ -2,15 +2,49 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { cache } from "react";
 import { PreviewAudio } from "./preview";
 import { findRelatedItems, getSourceItemByKey } from "@/util/services";
-import { Artist, Track } from "@/util/services/type";
+import { SearchResult, Track } from "@/util/services/type";
 import { services } from "@/components/SupportedServices";
 import { ServiceLogo } from "@/components/ServiceLogo";
 import { Share } from "@/components/Share";
 import { HomeLink } from "@/components/HomeLink";
+import { Provider, ResourceType } from "@/util/validators/type";
 
 const fallbackCover = "/img/cover-fallback.png";
+
+const getSourceItem = cache(async (key: string) => {
+  return (await getSourceItemByKey(key)) as Track | null;
+});
+
+const getRelatedItems = cache(
+  async (source: SearchResult, type: ResourceType, provider: Provider) => {
+    const results = await findRelatedItems(source, type, provider);
+    const items = results
+      .filter((res) => res.status === "fulfilled")
+      .map((res) => (res.status === "fulfilled" ? res.value : null))
+      .filter(Boolean) as Track[];
+    return items;
+  }
+);
+
+const getTrackMetadata = (track: Track, items: Track[]) => {
+  const spotifyTrack = items.find((res) => res?.provider === "spotify");
+  const appleTrack = items.find((res) => res?.provider === "appleMusic");
+
+  const name = spotifyTrack?.name ?? appleTrack?.name ?? track.name;
+  const album = spotifyTrack?.album ?? appleTrack?.album ?? track.album;
+  const artist = spotifyTrack?.artist ?? appleTrack?.artist ?? track.artist;
+  const cover =
+    spotifyTrack?.cover ?? appleTrack?.cover ?? track.cover ?? fallbackCover;
+  return {
+    name,
+    album,
+    artist,
+    cover,
+  };
+};
 
 type Props = {
   params: { key: string };
@@ -21,20 +55,23 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const key = params.key;
-  const track = (await getSourceItemByKey(key)) as Track | null;
+  const track = await getSourceItem(key);
   if (!track) return { title: "404 - Track not found" };
 
+  const items = await getRelatedItems(track, "track", track.provider);
+  const { name, artist, cover } = getTrackMetadata(track, items);
+
   let description = `Listen to ${track.name}`;
-  if (track.artist) description += ` by ${track.artist}`;
+  if (artist) description += ` by ${artist}`;
   description += " on your favorite music service";
 
   return {
-    title: `${track.name} - ${track.artist}`,
+    title: `${name} - ${artist}`,
     description,
 
     openGraph: {
       type: "music.song",
-      images: track.cover,
+      images: cover,
       url: `https://songlink.cc/track/${key}`,
     },
   };
@@ -45,23 +82,12 @@ export default async function Page({ params }: Props) {
 
   if (!key) redirect("/404?source=track");
 
-  const track = (await getSourceItemByKey(key)) as Track | null;
+  const track = await getSourceItem(key);
 
   if (!track) redirect("/404?source=track&key=" + key);
-  const results = await findRelatedItems(track, "track", track.provider);
-  const items = results
-    .filter((res) => res.status === "fulfilled")
-    .map((res) => (res.status === "fulfilled" ? res.value : null))
-    .filter(Boolean) as Track[];
+  const items = await getRelatedItems(track, "track", track.provider);
 
-  const spotifyTrack = items.find((res) => res?.provider === "spotify");
-  const appleTrack = items.find((res) => res?.provider === "appleMusic");
-
-  const name = spotifyTrack?.name ?? appleTrack?.name ?? track.name;
-  const album = spotifyTrack?.album ?? appleTrack?.album ?? track.album;
-  const artist = spotifyTrack?.artist ?? appleTrack?.artist ?? track.artist;
-  const cover =
-    spotifyTrack?.cover ?? appleTrack?.cover ?? track.cover ?? fallbackCover;
+  const { name, album, artist, cover } = getTrackMetadata(track, items);
 
   const links = items
     .map((res) => {
