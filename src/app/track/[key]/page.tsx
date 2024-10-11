@@ -37,7 +37,8 @@ const getTrackMetadata = (track: Track, items: Track[]) => {
   const album = spotifyTrack?.album ?? appleTrack?.album ?? track.album;
   const artist = spotifyTrack?.artist ?? appleTrack?.artist ?? track.artist;
   const cover =
-    spotifyTrack?.cover ?? appleTrack?.cover ?? track.cover ?? fallbackCover;
+    spotifyTrack?.cover ?? track.cover ?? appleTrack?.cover ?? fallbackCover;
+
   return {
     name,
     album,

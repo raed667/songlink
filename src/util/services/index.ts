@@ -144,7 +144,7 @@ export const findRelatedItems = async (
 
 export const getSourceItemByKey = async (key: string) => {
   const [provider, type, id] = key.split("_");
-  if (!provider || !type || !id) throw new Error("Invalid key");
+  if (!provider || !type || !id) throw new Error(`Invalid key="${key}"`);
 
   if (!isSupportedType(type)) {
     throw new Error(`Resource of type "${type}" not supported`);
