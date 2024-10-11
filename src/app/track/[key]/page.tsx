@@ -71,8 +71,11 @@ export async function generateMetadata(
     description,
 
     openGraph: {
-      type: "music.song",
+      description,
       images: cover,
+      locale: "en_US",
+      type: "music.song",
+      title: `${name} - ${artist}`,
       url: `https://songlink.cc/track/${key}`,
     },
   };
