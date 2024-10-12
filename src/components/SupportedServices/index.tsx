@@ -74,7 +74,7 @@ export const SupportedServices: React.FC = () => {
               height={32}
               className={clsx("w-8 h-8", service.soon && "grayscale")}
             />
-            <span>{service.name}</span>
+            <span className="hidden sm:inline">{service.name}</span>
 
             {service.soon && (
               <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
@@ -84,7 +84,7 @@ export const SupportedServices: React.FC = () => {
           </div>
         ))}
         <Link href="https://github.com/raed667/songlink/discussions">
-          <div className="text-gray-800 bg-gray-100 h-full p-2 rounded-md flex items-center gap-2 cursor-pointer active:bg-gray-200">
+          <div className="text-gray-800 bg-gray-100 h-full p-2 rounded-md  items-center gap-2 cursor-pointer active:bg-gray-200 hidden sm:flex">
             <Plus /> Request a service
           </div>
         </Link>

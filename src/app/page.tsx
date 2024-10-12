@@ -22,7 +22,7 @@ export default function Home() {
 
       <SupportedServices />
       <Counter />
-      <div className="mt-8 mx-auto">
+      <div className="mt-8 mx-auto px-4 sm:px-8">
         <NewSongs />
       </div>
     </main>

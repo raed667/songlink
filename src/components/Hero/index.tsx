@@ -44,7 +44,7 @@ export const Hero: React.FC<Props> = ({ announcement }) => {
           <div className="flex items-center justify-center gap-x-6">
             <Link
               href="/about"
-              className="text-sm font-semibold leading-6 text-gray-900"
+              className="text-sm font-semibold leading-6 text-gray-900 hidden sm:inline"
             >
               why I built song link <span aria-hidden="true">→</span>
             </Link>
