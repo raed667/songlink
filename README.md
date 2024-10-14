@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# [songlink.cc](https://www.songlink.cc/?s=github) 
 
-## Getting Started
+Share your favorite song, album or artist with your friends without worrying about which music streaming service they use.
 
-First, run the development server:
+### Why songlink.cc?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Besides the obvious *why not* answer. I wanted to create a simple tool to share music with my friends across different platforms.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+I wanted to build this tool to avoid lock-in, and to make it easier to share music without having to remember which platform each person uses.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Deploy your own instance
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+SongLink is a Next.js application, Postgres is used a DB and Redis as cache. Provide required keys and ids in the `.env` then run locally using `npm dev`. 
 
-## Learn More
+SongLink is currently deployed on Vercel free tier, but can deployed on any envrionmenet. 
 
-To learn more about Next.js, take a look at the following resources:
+### What data do you store?
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+I store the links you generate, the source and target platforms. I do not store any personal information.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Logging 
 
-## Deploy on Vercel
+The project uses [Axiom](https://axiom.co/docs/get-help/faq) as a log management and analytics solution.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+[MIT](LICENSE)
