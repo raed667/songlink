@@ -179,17 +179,17 @@ class Tidal {
 
     if (
       type === "artist" &&
-      data.resource.name &&
-      !data.resource.artifactType
+      data?.resource?.name &&
+      !data?.resource?.artifactType
     ) {
       return this.parseArtist(key, data.resource);
     }
 
-    if (type === "album" && data.resource.type === "ALBUM") {
+    if (type === "album" && data?.resource?.type === "ALBUM") {
       return this.parseAlbum(key, data.resource);
     }
 
-    if (type === "track" && data.resource.artifactType === "track") {
+    if (type === "track" && data?.resource?.artifactType === "track") {
       return this.parseTrack(key, data.resource);
     }
 
