@@ -10,7 +10,7 @@ import { services } from "@/components/SupportedServices";
 import { ServiceLogo } from "@/components/ServiceLogo";
 import { Share } from "@/components/Share";
 import { HomeLink } from "@/components/HomeLink";
-import { Provider, ResourceType } from "@/util/validators/type";
+import { ResourceType } from "@/util/validators/type";
 
 const fallbackCover = "/img/cover-fallback.png";
 
@@ -31,13 +31,19 @@ const getRelatedItems = cache(
 
 const getTrackMetadata = (track: Track, items: Track[]) => {
   const spotifyTrack = items.find((res) => res?.provider === "spotify");
+  const deezerTrack = items.find((res) => res?.provider === "deezer");
   const appleTrack = items.find((res) => res?.provider === "appleMusic");
 
   const name = spotifyTrack?.name ?? appleTrack?.name ?? track.name;
   const album = spotifyTrack?.album ?? appleTrack?.album ?? track.album;
   const artist = spotifyTrack?.artist ?? appleTrack?.artist ?? track.artist;
+
   const cover =
-    spotifyTrack?.cover ?? track.cover ?? appleTrack?.cover ?? fallbackCover;
+    spotifyTrack?.cover ??
+    deezerTrack?.cover ??
+    appleTrack?.cover ??
+    track.cover ??
+    fallbackCover;
 
   return {
     name,

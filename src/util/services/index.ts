@@ -1,5 +1,5 @@
 import { sql } from "@vercel/postgres";
-import { log, Logger } from "next-axiom";
+import { log } from "next-axiom";
 import { Provider, ResourceType } from "../validators/type";
 import { isSupportedProvider, isSupportedType } from "../validators";
 import spotify from "./spotify";
@@ -60,7 +60,6 @@ export const findRelatedItems = async (
   source: SearchResult,
   type: ResourceType
 ) => {
-  const log = new Logger();
   log.debug("finding related items", { source, type });
   const promises = [];
   const searchParams = getSearchParams(source, type);

@@ -1,4 +1,3 @@
-import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 import { AxiomRequest, withAxiom } from "next-axiom";
 import { findRelatedItems, findSourceItem } from "@/util/services";
