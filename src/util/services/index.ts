@@ -58,21 +58,20 @@ const getSearchParams = (
 
 export const findRelatedItems = async (
   source: SearchResult,
-  type: ResourceType,
-  provider: Provider
+  type: ResourceType
 ) => {
   const log = new Logger();
-  log.debug("finding related items", { source, type, provider });
+  log.debug("finding related items", { source, type });
   const promises = [];
   const searchParams = getSearchParams(source, type);
   const keys: Record<string, string> = {
     [source.provider]: source.key,
   };
 
-  const { rows } = await isSavedRelationship(source.key, provider);
+  const { rows } = await isSavedRelationship(source.key, source.provider);
   const cachedKeys = rows[0] ?? {};
 
-  if (provider !== "spotify") {
+  if (source.provider !== "spotify") {
     if (cachedKeys["spotify"]) {
       promises.push(getSourceItemByKey(cachedKeys["spotify"]));
     } else {
@@ -80,7 +79,7 @@ export const findRelatedItems = async (
     }
   }
 
-  if (provider !== "appleMusic") {
+  if (source.provider !== "appleMusic") {
     if (cachedKeys["applemusic"]) {
       promises.push(getSourceItemByKey(cachedKeys["applemusic"]));
     } else {
@@ -88,7 +87,7 @@ export const findRelatedItems = async (
     }
   }
 
-  if (provider !== "deezer") {
+  if (source.provider !== "deezer") {
     if (cachedKeys["deezer"]) {
       promises.push(getSourceItemByKey(cachedKeys["deezer"]));
     } else {
@@ -96,7 +95,7 @@ export const findRelatedItems = async (
     }
   }
 
-  if (provider !== "tidal") {
+  if (source.provider !== "tidal") {
     if (cachedKeys["tidal"]) {
       promises.push(getSourceItemByKey(cachedKeys["tidal"]));
     } else {
@@ -104,9 +103,9 @@ export const findRelatedItems = async (
     }
   }
 
-  if (provider !== "youtubeMusic") {
-    if (cachedKeys["youtubeMusic"]) {
-      promises.push(getSourceItemByKey(cachedKeys["youtubeMusic"]));
+  if (source.provider !== "youtubeMusic") {
+    if (cachedKeys["youtubemusic"]) {
+      promises.push(getSourceItemByKey(cachedKeys["youtubemusic"]));
     } else {
       promises.push(youtubeMusic.search(type, searchParams));
     }

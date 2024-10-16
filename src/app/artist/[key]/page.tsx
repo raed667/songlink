@@ -47,7 +47,7 @@ export default async function Page({ params }: Props) {
   if (!key) redirect("/404?source=artist");
   const artist = await getSourceItem(key);
   if (!artist) redirect("/404?source=artist&key=" + key);
-  const results = await findRelatedItems(artist, "artist", artist.provider);
+  const results = await findRelatedItems(artist, "artist");
 
   const cover =
     artist.cover ??

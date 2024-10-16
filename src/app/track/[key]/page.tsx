@@ -19,8 +19,8 @@ const getSourceItem = cache(async (key: string) => {
 });
 
 const getRelatedItems = cache(
-  async (source: SearchResult, type: ResourceType, provider: Provider) => {
-    const results = await findRelatedItems(source, type, provider);
+  async (source: SearchResult, type: ResourceType) => {
+    const results = await findRelatedItems(source, type);
     const items = results
       .filter((res) => res.status === "fulfilled")
       .map((res) => (res.status === "fulfilled" ? res.value : null))
@@ -59,7 +59,7 @@ export async function generateMetadata(
   const track = await getSourceItem(key);
   if (!track) return { title: "404 - Track not found" };
 
-  const items = await getRelatedItems(track, "track", track.provider);
+  const items = await getRelatedItems(track, "track");
   const { name, artist, cover } = getTrackMetadata(track, items);
 
   let description = `Listen to ${track.name}`;
@@ -89,7 +89,7 @@ export default async function Page({ params }: Props) {
   const track = await getSourceItem(key);
 
   if (!track) redirect("/404?source=track&key=" + key);
-  const items = await getRelatedItems(track, "track", track.provider);
+  const items = await getRelatedItems(track, "track");
 
   const { name, album, artist, cover } = getTrackMetadata(track, items);
 

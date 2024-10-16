@@ -32,7 +32,7 @@ export async function generateMetadata(
   if (album.artist) description += ` by ${album.artist}`;
   description += " on your favorite music service";
 
-  const results = await findRelatedItems(album, "album", album.provider);
+  const results = await findRelatedItems(album, "album");
 
   const cover =
     album.cover ??
@@ -66,7 +66,7 @@ export default async function Page({ params }: Props) {
   const album = await getSourceItem(key);
   if (!album) redirect("/404?source=album&key=" + key);
 
-  const results = await findRelatedItems(album, "album", album.provider);
+  const results = await findRelatedItems(album, "album");
 
   const cover =
     album.cover ??
