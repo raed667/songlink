@@ -133,7 +133,6 @@ export const findRelatedItems = async (
       log.error("Error saving key relations", {
         error,
       });
-      console.error("Error saving key relations", error);
     }
   }
   await log.flush();

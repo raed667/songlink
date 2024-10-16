@@ -44,7 +44,6 @@ export async function submitLink(
       errorMessage: validation.error,
     };
   } catch (error: any) {
-    console.log(error);
     track("Link Error", { link, message: error.message });
     return { errorMessage: error.message ?? "Unexpected error occurred" };
   }

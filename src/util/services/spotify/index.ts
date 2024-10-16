@@ -1,5 +1,6 @@
 import { kv } from "@vercel/kv";
 import { backOff } from "exponential-backoff";
+import { log } from "next-axiom";
 import { SearchParams, SearchResult } from "../type";
 import { ResourceType } from "@/util/validators/type";
 
@@ -38,6 +39,12 @@ class Spotify {
         },
       }
     );
+    if (response.status === 401) {
+      const message = await response.text();
+      console.log("response", response.status, message);
+      return await this.deleteAuthToken();
+    }
+
     const result = await response.json();
 
     if (type === "artist" && result?.artists?.items.length > 0) {
@@ -66,6 +73,12 @@ class Spotify {
     return null;
   }
 
+  private static async deleteAuthToken() {
+    log.error("Spotify token expired");
+    await kv.rename("spotify_access_token", "spotify_access_token_old");
+    return null;
+  }
+
   private static async getAuthToken(): Promise<string> {
     const token = await kv.get("spotify_access_token");
     if (token) return String(token);
@@ -87,11 +100,7 @@ class Spotify {
     }
     const data = await response.json();
 
-    await kv.setex(
-      "spotify_access_token",
-      data.expires_in - 1,
-      data.access_token
-    );
+    await kv.setex("spotify_access_token", 3000, data.access_token);
 
     return data.access_token as string;
   }
@@ -106,16 +115,13 @@ class Spotify {
     market = "US"
   ): Promise<SearchResult | null> {
     const key = this.getKey(id, type);
-    try {
-      const cached = await kv.get(key);
-      if (cached) {
-        // TODO validate cache
-        return { ...cached, cache: true } as SearchResult;
-      }
-    } catch (e) {
-      console.log("CACHE ERROR", e);
+
+    const cached = await kv.get(key);
+    if (cached) {
+      // TODO validate cache
+      return { ...cached, cache: true } as SearchResult;
     }
-    console.log("SPOTIFY getById", { id, type, market });
+
     const resource = await backOff(() => Spotify._getById(id, type, market), {
       maxDelay: 3500,
       numOfAttempts: 5,
@@ -180,6 +186,12 @@ class Spotify {
         },
       }
     );
+
+    if (response.status === 401) {
+      const message = await response.text();
+      console.log("response", response.status, message);
+      return await this.deleteAuthToken();
+    }
 
     const data = await response.json();
     if (type === "artist" && data.type === "artist") {

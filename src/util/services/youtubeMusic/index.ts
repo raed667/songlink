@@ -146,13 +146,6 @@ class YoutubeMusic {
       return this.parseArtist(key, item);
     }
 
-    // if (resource === "album") {
-    //   console.log("album", id);
-    //   const item = await api.getAlbum(id);
-    //   console.log(item);
-    //   return this.parseAlbum(key, item);
-    // }
-
     if (resource === "track") {
       const item = await api.getSong(id);
       return this.parseTrack(key, item);
