@@ -138,7 +138,7 @@ export default async function Page({ params }: Props) {
       <ol>
         {links.map((link, i) => {
           if (!link) return null;
-          const name =
+          const providerName =
             services.find(
               (service) =>
                 service.key.toLocaleLowerCase() ===
@@ -151,7 +151,7 @@ export default async function Page({ params }: Props) {
             >
               <ServiceLogo name={link.provider} />
               <a href={link.link}>
-                Listen to {name} by {artist} on {name}
+                Listen to {name} by {artist} on {providerName}
               </a>
             </li>
           );
