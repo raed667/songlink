@@ -30,12 +30,12 @@ An optional `details=true` parameter can be passed to get more information back.
 
 ```bash
 ## Query
-$ curl 'https://songlink.cc/link?link=https%3A%2F%2Fdeezer.page.link%2FkFQz1xRvX5F2vKLP8'
+$ curl 'https://songlink.cc/link?link={YOUR_LINK}'
 
 ## Response
 {
     "status": "success",
-    "songLink": "https://songlink.cc/artist/deezer_artist_2471"
+    "songLink": "https://songlink.cc/track/{ID}"
 }
 ```
 
