@@ -81,7 +81,7 @@ class Spotify {
 
   private static async getAuthToken(): Promise<string> {
     const token = await kv.get("spotify_access_token");
-    if (token) return String(token);
+    if (token != null) return String(token);
 
     const response = await fetch("https://accounts.spotify.com/api/token", {
       method: "POST",
@@ -89,6 +89,7 @@ class Spotify {
         Authorization: `Basic ${Buffer.from(
           `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
         ).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
         grant_type: "client_credentials",
