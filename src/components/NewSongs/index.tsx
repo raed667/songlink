@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import { FreeMode, Autoplay } from "swiper/modules";
 import { LoaderCircle } from "lucide-react";
-import { Track } from "@/util/services/type";
+import { Album, Track } from "@/util/services/type";
 
 import "swiper/css";
 
@@ -12,17 +12,33 @@ const getTracks = async () => {
     next: { revalidate: 3600 },
   });
   const data = await response.json();
-  return data.tracks as Track[];
+  if (data.type === "album") {
+    return {
+      type: "album",
+      results: data.results as Album[],
+    };
+  }
+  if (data.type === "track") {
+    return {
+      type: "track",
+      results: data.results as Track[],
+    };
+  }
+  return null;
 };
 
 export const NewSongs: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [tracks, setTracks] = useState<Track[]>([]);
+  const [results, setResults] = useState<Array<Track | Album>>([]);
+  const [type, setType] = useState<string | null>(null);
 
   useEffect(() => {
     getTracks()
-      .then((tracks) => {
-        setTracks(tracks);
+      .then((results) => {
+        if (results) {
+          setType(results.type);
+          setResults(results.results);
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -38,9 +54,6 @@ export const NewSongs: React.FC = () => {
 
   return (
     <div>
-      {/* <div className="mb-4 mx-auto max-w-2xl mt-8 flex justify-center text-gray-800 grayscale font-bold">
-        Trending songs
-      </div> */}
       <Swiper
         freeMode={true}
         loop={true}
@@ -77,25 +90,25 @@ export const NewSongs: React.FC = () => {
         }}
         modules={[FreeMode, Autoplay]}
       >
-        {tracks
-          .filter((track) => !!track.cover)
-          .map((track) => {
+        {results
+          .filter((item) => !!item.cover)
+          .map((item) => {
             return (
-              <SwiperSlide key={track.id}>
-                <a href={`/track/${track.key}`}>
+              <SwiperSlide key={item.id}>
+                <a href={`/${type}/${item.key}`}>
                   <Image
                     className="rounded-md drop-shadow-md"
-                    src={track.cover!}
-                    alt={track.name}
+                    src={item.cover!}
+                    alt={item.name}
                     width={200}
                     height={200}
                   />
                   <div className="mt-2 ">
-                    <div className="text-lg font-semibold flex items-center gap-2">
-                      {track.name}
+                    <div className="text-lg font-semibold flex items-center gap-2 truncate">
+                      {item.name}
                     </div>
                     <div className="text-md font-semibold text-gray-800">
-                      {track.artist}
+                      {item.artist}
                     </div>
                   </div>
                 </a>

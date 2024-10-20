@@ -1,3 +1,5 @@
+"use server";
+
 import { sql } from "@vercel/postgres";
 import { log } from "next-axiom";
 import { Provider, ResourceType } from "../validators/type";
@@ -9,8 +11,7 @@ import tidal from "./tidal";
 import youtubeMusic from "./youtubeMusic";
 import { SearchResult } from "./type";
 import { cleanTitle } from "./helpers/clean";
-
-export const maxDuration = 60;
+// export const maxDuration = 60;
 
 export const findSourceItem = async (
   id: string,
