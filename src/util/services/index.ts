@@ -62,6 +62,11 @@ export const findRelatedItems = async (
 ) => {
   log.debug("finding related items", { source, type });
   const promises = [];
+  const services: Array<{
+    service: string;
+    method: "search" | "getById";
+  }> = [];
+
   const searchParams = getSearchParams(source, type);
   const keys: Record<string, string> = {
     [source.provider]: source.key,
@@ -73,46 +78,74 @@ export const findRelatedItems = async (
   if (source.provider !== "spotify") {
     if (cachedKeys["spotify"]) {
       promises.push(getSourceItemByKey(cachedKeys["spotify"]));
+      services.push({
+        service: "spotify",
+        method: "getById",
+      });
     } else {
       promises.push(spotify.search(type, searchParams));
+      services.push({
+        service: "spotify",
+        method: "search",
+      });
     }
   }
 
   if (source.provider !== "appleMusic") {
     if (cachedKeys["applemusic"]) {
       promises.push(getSourceItemByKey(cachedKeys["applemusic"]));
+      services.push({
+        service: "appleMusic",
+        method: "getById",
+      });
     } else {
       promises.push(appleMusic.search(type, searchParams));
+      services.push({
+        service: "appleMusic",
+        method: "search",
+      });
     }
   }
 
   if (source.provider !== "deezer") {
     if (cachedKeys["deezer"]) {
       promises.push(getSourceItemByKey(cachedKeys["deezer"]));
+      services.push({
+        service: "deezer",
+        method: "getById",
+      });
     } else {
       promises.push(deezer.search(type, searchParams));
+      services.push({
+        service: "deezer",
+        method: "search",
+      });
     }
   }
 
   if (source.provider !== "tidal") {
     if (cachedKeys["tidal"]) {
       promises.push(getSourceItemByKey(cachedKeys["tidal"]));
+      services.push({ service: "tidal", method: "getById" });
     } else {
       promises.push(tidal.search(type, searchParams));
+      services.push({ service: "tidal", method: "search" });
     }
   }
 
   if (source.provider !== "youtubeMusic") {
     if (cachedKeys["youtubemusic"]) {
       promises.push(getSourceItemByKey(cachedKeys["youtubemusic"]));
+      services.push({ service: "youtubeMusic", method: "getById" });
     } else {
       promises.push(youtubeMusic.search(type, searchParams));
+      services.push({ service: "youtubeMusic", method: "search" });
     }
   }
 
   const results = await Promise.allSettled(promises);
 
-  results.forEach(async (result) => {
+  results.forEach(async (result, idx) => {
     if (result.status === "fulfilled" && result.value) {
       const { provider, key } = result.value;
       keys[provider] = key;
@@ -120,7 +153,13 @@ export const findRelatedItems = async (
         await appendKey(cachedKeys.id, provider, key);
       }
     } else {
-      log.error("Error finding related items", { result, type, searchParams });
+      const { service, method } = services[idx];
+      log.error("Error finding related items", {
+        ...searchParams,
+        type,
+        service,
+        method,
+      });
     }
   });
   if (
@@ -128,9 +167,10 @@ export const findRelatedItems = async (
     Object.values(keys).length > 1
   ) {
     try {
-      await saveRelatedKeys(keys);
+      await saveOrUpdateRelatedKeys(keys);
     } catch (error) {
       log.error("Error saving key relations", {
+        keys,
         error,
       });
     }
@@ -153,8 +193,44 @@ export const getSourceItemByKey = async (key: string) => {
   return findSourceItem(id, type, provider);
 };
 
+const saveOrUpdateRelatedKeys = async (keys: Record<string, string>) => {
+  const ids = await Promise.all(
+    Object.entries(keys).map(async ([provider, key]) => {
+      const { rows } = await isSavedRelationship(key, provider as Provider);
+      const cachedKeys = rows[0] ?? {};
+      if (cachedKeys.id) {
+        return cachedKeys.id as number;
+      }
+    })
+  );
+
+  const uniqueIds = Array.from(
+    new Set(ids.filter((id): id is number => id !== undefined))
+  );
+
+  if (uniqueIds.length > 1) {
+    throw new Error(
+      `Database inconsistency, found multiple matches for the same row: ${uniqueIds.join(
+        ","
+      )}`
+    );
+  }
+
+  const id = uniqueIds.at(0);
+
+  if (id === undefined) {
+    return await saveRelatedKeys(keys);
+  } else {
+    return await updateRelatedKeys(id, keys);
+  }
+};
+
 const saveRelatedKeys = async (keys: Record<string, string>) => {
   return sql`INSERT INTO relationship_cache (spotify, deezer, applemusic, tidal, youtubemusic) VALUES (${keys.spotify}, ${keys.deezer}, ${keys.appleMusic}, ${keys.tidal}, ${keys.youtubeMusic})`;
+};
+
+const updateRelatedKeys = async (id: number, keys: Record<string, string>) => {
+  return sql`UPDATE relationship_cache SET spotify=${keys.spotify}, deezer=${keys.deezer}, applemusic=${keys.appleMusic}, tidal=${keys.tidal}, youtubemusic=${keys.youtubeMusic} WHERE id=${id}`;
 };
 
 const isSavedRelationship = async (key: string, provider: Provider) => {
