@@ -6,11 +6,13 @@ import { getSourceItemByKey } from "@/util/services";
 export const maxDuration = 60;
 
 export const GET = withAxiom(async (req: AxiomRequest) => {
+  const type =
+    req.nextUrl.searchParams.get("type") === "album" ? "%album%" : "%track%";
   try {
     const { rows } =
-      await sql`SELECT * FROM relationship_cache WHERE spotify LIKE '%track%' OR deezer LIKE '%track%' OR applemusic LIKE '%track%' OR tidal LIKE '%track%' OR youtubemusic LIKE '%track%' ORDER BY created_at DESC LIMIT 50;`;
+      await sql`SELECT * FROM relationship_cache WHERE spotify LIKE ${type} OR deezer LIKE ${type} OR applemusic LIKE ${type} OR tidal LIKE ${type} OR youtubemusic LIKE ${type} ORDER BY created_at DESC LIMIT 50;`;
 
-    const tracks = [];
+    const results = [];
 
     let keys: string[] = rows.map(
       (row) =>
@@ -21,26 +23,26 @@ export const GET = withAxiom(async (req: AxiomRequest) => {
         row.tidal
     );
 
-    keys = keys.sort(() => Math.random() - 0.5).slice(0, 20);
+    keys = keys.sort(() => Math.random() - 0.5);
 
     const res = await Promise.allSettled(
       keys.map((key) => getSourceItemByKey(key))
     );
 
     for (let i = 0; i < res.length; i++) {
-      const track = res[i];
-      if (tracks.length >= 10) break;
+      const result = res[i];
+      if (results.length >= 20) break;
 
-      if (track.status === "fulfilled" && track.value != null) {
-        tracks.push(track.value);
+      if (result.status === "fulfilled" && result.value != null) {
+        results.push(result.value);
       }
     }
 
-    return NextResponse.json({ tracks });
+    return NextResponse.json({ type: type.replaceAll("%", ""), results });
   } catch (error: any) {
     req.log.error("get new songs error", {
       error,
     });
-    return NextResponse.json({ tracks: [], error: error.message });
+    return NextResponse.json({ type, results: [], error: error.message });
   }
 });
