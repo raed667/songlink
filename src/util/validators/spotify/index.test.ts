@@ -88,4 +88,20 @@ describe("Spotify URL validator", () => {
       });
     }
   );
+
+  it.each(["fr", "en", "es", "it"])(
+    "should return true for international links",
+    (region) => {
+      expect(
+        SpotifyValidator.validate(
+          `https://open.spotify.com/intl-${region}/track/abc123`
+        )
+      ).resolves.toStrictEqual({
+        id: "abc123",
+        isValid: true,
+        type: "track",
+        provider: "spotify",
+      });
+    }
+  );
 });

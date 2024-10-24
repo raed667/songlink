@@ -31,6 +31,8 @@ class SpotifyValidator {
           provider: "spotify",
         };
 
+      url = url.replace(/\/intl-\w+\//, "/");
+
       const resourceType = SpotifyValidator.extractResourceType(url);
       if (!SpotifyValidator.isSupportedType(resourceType)) {
         return {
@@ -62,6 +64,9 @@ class SpotifyValidator {
   private static extractResourceType(url: string): ResourceType {
     const path = new URL(url).pathname;
     const resourceType = path.split("/")[1];
+    if (resourceType?.startsWith("intl-")) {
+      return path.split("/")[2] as ResourceType;
+    }
     return resourceType as ResourceType;
   }
 
