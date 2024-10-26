@@ -1,6 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 import { AxiomRequest, withAxiom } from "next-axiom";
+import { kv } from "@vercel/kv";
 import { getSourceItemByKey } from "@/util/services";
 
 export const maxDuration = 60;
@@ -8,7 +9,19 @@ export const maxDuration = 60;
 export const GET = withAxiom(async (req: AxiomRequest) => {
   const type =
     req.nextUrl.searchParams.get("type") === "album" ? "%album%" : "%track%";
+
+  const key = `new_items_${type}`;
+
   try {
+    const cached = await kv.get(key);
+    if (cached && Array.isArray(cached)) {
+      return NextResponse.json({
+        type: type.replaceAll("%", ""),
+        results: cached,
+        cached: true,
+      });
+    }
+
     const { rows } =
       await sql`SELECT * FROM relationship_cache WHERE spotify LIKE ${type} OR deezer LIKE ${type} OR applemusic LIKE ${type} OR tidal LIKE ${type} OR youtubemusic LIKE ${type} ORDER BY created_at DESC LIMIT 50;`;
 
@@ -37,6 +50,8 @@ export const GET = withAxiom(async (req: AxiomRequest) => {
         results.push(result.value);
       }
     }
+
+    await kv.setex(key, 60 * 60, JSON.stringify(results));
 
     return NextResponse.json({ type: type.replaceAll("%", ""), results });
   } catch (error: any) {
