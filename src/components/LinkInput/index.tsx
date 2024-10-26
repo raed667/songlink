@@ -6,6 +6,7 @@ import { useFormStatus, useFormState } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 // import { useDebounce } from "@uidotdev/usehooks";
 import Image from "next/image";
+import Link from "next/link";
 import { submitLink } from "@/app/actions";
 import { findSourceItem } from "@/util/services";
 
@@ -40,6 +41,12 @@ export const LinkInput: React.FC = () => {
       >
         {state.errorMessage && <CircleX className="inline mr-2" />}
         {state.errorMessage}
+        <Link
+          className="ml-1 text-indigo-600"
+          href="https://github.com/raed667/songlink/issues/new"
+        >
+          Report an issue
+        </Link>
       </div>
     </>
   );

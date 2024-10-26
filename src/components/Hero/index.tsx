@@ -17,11 +17,11 @@ export const Hero: React.FC<Props> = ({ announcement }) => {
           <div className="hidden mt-4 sm:mb-2 sm:flex sm:justify-center">
             <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 flex">
               <Info className="inline mr-2 stroke-gray-400" />
-              {announcement.title + " "}
+              {announcement.title}
               {announcement.href && announcement.linkText && (
                 <a
                   href={announcement.href}
-                  className="font-semibold text-indigo-600 ml-2"
+                  className="font-semibold text-indigo-600 ml-1"
                 >
                   <span className="absolute inset-0" aria-hidden="true" />
                   {announcement.linkText} <span aria-hidden="true">&rarr;</span>
