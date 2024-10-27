@@ -6,45 +6,45 @@ import { ResourceType } from "@/util/validators/type";
 class AppleMusic {
   public static _name: "appleMusic";
 
-  public static async search(
-    type: ResourceType,
-    params: SearchParams,
-    market = "US"
-  ) {
-    return await backOff(() => AppleMusic._search(type, params, market), {
-      numOfAttempts: 5,
-      maxDelay: 3500,
-    });
-  }
+  // public static async search(
+  //   type: ResourceType,
+  //   params: SearchParams,
+  //   market = "US"
+  // ) {
+  //   return await backOff(() => AppleMusic._search(type, params, market), {
+  //     numOfAttempts: 5,
+  //     maxDelay: 3500,
+  //   });
+  // }
 
-  private static async _search(
-    type: ResourceType,
-    params: SearchParams,
-    market = "US"
-  ): Promise<SearchResult | null> {
-    if (type === "artist" && params.artist_name != undefined) {
-      return AppleMusic.search_artist(params.artist_name, market);
-    }
+  // private static async _search(
+  //   type: ResourceType,
+  //   params: SearchParams,
+  //   market = "US"
+  // ): Promise<SearchResult | null> {
+  //   if (type === "artist" && params.artist_name != undefined) {
+  //     return AppleMusic.search_artist(params.artist_name, market);
+  //   }
 
-    if (type === "album") {
-      return AppleMusic.search_album(
-        params.artist_name ?? "",
-        params.album_name ?? "",
-        market
-      );
-    }
+  //   if (type === "album") {
+  //     return AppleMusic.search_album(
+  //       params.artist_name ?? "",
+  //       params.album_name ?? "",
+  //       market
+  //     );
+  //   }
 
-    if (type === "track") {
-      return AppleMusic.search_track(
-        params.track_name ?? "",
-        params.artist_name ?? "",
-        params.album_name ?? "",
-        market
-      );
-    }
+  //   if (type === "track") {
+  //     return AppleMusic.search_track(
+  //       params.track_name ?? "",
+  //       params.artist_name ?? "",
+  //       params.album_name ?? "",
+  //       market
+  //     );
+  //   }
 
-    return null; // should never happen
-  }
+  //   return null; // should never happen
+  // }
 
   private static async search_track(
     track_name: string,

@@ -6,11 +6,9 @@ import { cache } from "react";
 import { PreviewAudio } from "./preview";
 import { findRelatedItems, getSourceItemByKey } from "@/util/services";
 import { SearchResult, Track } from "@/util/services/type";
-import { services } from "@/components/SupportedServices";
 import { ServiceLogo } from "@/components/ServiceLogo";
-import { Share } from "@/components/Share";
-import { HomeLink } from "@/components/HomeLink";
 import { ResourceType } from "@/util/validators/type";
+import { services } from "@/util/services/list";
 
 const fallbackCover = "/img/cover-fallback.png";
 
@@ -119,7 +117,6 @@ export default async function Page({ params }: Props) {
 
   return (
     <main className="min-h-full sm:mx-auto max-w-2xl mt-2 md:mt-6 px-2">
-      <HomeLink />
       <Image
         className="rounded-md drop-shadow-md"
         src={cover}
@@ -142,7 +139,7 @@ export default async function Page({ params }: Props) {
       </div>
 
       <ol>
-        {links.map((link, i) => {
+        {links.map((link) => {
           if (!link) return null;
           const providerName =
             services.find(
@@ -163,8 +160,6 @@ export default async function Page({ params }: Props) {
           );
         })}
       </ol>
-
-      <Share />
     </main>
   );
 }

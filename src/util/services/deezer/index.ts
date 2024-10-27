@@ -6,65 +6,6 @@ import { ResourceType } from "@/util/validators/type";
 class Deezer {
   public static _name: "deezer";
 
-  static async search(type: ResourceType, params: SearchParams, market = "US") {
-    return await backOff(() => Deezer._search(type, params, market), {
-      numOfAttempts: 5,
-      maxDelay: 3500,
-    });
-  }
-
-  static async _search(
-    type: ResourceType,
-    params: SearchParams,
-    market = "US"
-  ): Promise<SearchResult | null> {
-    let q = ``;
-
-    if (params.track_name) {
-      // q += `track:"${params.track_name}"`;
-      q += `${params.track_name}`;
-    }
-    if (params.album_name) {
-      // q += `album:"${params.album_name}"`;
-      q += ` ${params.album_name}`;
-    }
-    if (params.artist_name) {
-      // q += `artist:"${params.artist_name}"`;
-      q += ` ${params.artist_name}`;
-    }
-    const response = await fetch(
-      `https://api.deezer.com/search/${type}?q=${q}`
-    );
-    const result = await response.json();
-
-    if (!result || !result.data || result.data.length === 0) {
-      return null;
-    }
-
-    const item = result.data[0];
-    const key = this.getKey(item.id, type);
-
-    if (type === "artist" && item.type === "artist") {
-      const value = this.parseArtist(key, item);
-      await kv.set(key, JSON.stringify(value));
-      return value;
-    }
-
-    if (type === "album" && item.type === "album") {
-      const value = this.parseAlbum(key, item);
-      await kv.set(key, JSON.stringify(value));
-      return value;
-    }
-
-    if (type === "track" && item.type === "track") {
-      const value = this.parseTrack(key, item);
-      await kv.set(key, JSON.stringify(value));
-      return value;
-    }
-
-    return null;
-  }
-
   static getKey(id: string, type: ResourceType) {
     return `deezer_${type}_${id}`;
   }
