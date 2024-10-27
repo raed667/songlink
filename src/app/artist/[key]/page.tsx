@@ -6,9 +6,7 @@ import { cache } from "react";
 import { findRelatedItems, getSourceItemByKey } from "@/util/services";
 
 import { ServiceLogo } from "@/components/ServiceLogo";
-import { services } from "@/components/SupportedServices";
-import { Share } from "@/components/Share";
-import { HomeLink } from "@/components/HomeLink";
+import { services } from "@/util/services/list";
 const fallbackCover = "/img/cover-fallback.png";
 
 const getSourceItem = cache(async (key: string) => {
@@ -78,7 +76,6 @@ export default async function Page({ params }: Props) {
 
   return (
     <main className="min-h-full mx-auto max-w-2xl mt-2 md:mt-6 px-2">
-      <HomeLink />
       <Image
         className="rounded-md drop-shadow-md"
         src={cover}
@@ -110,8 +107,6 @@ export default async function Page({ params }: Props) {
           );
         })}
       </ol>
-
-      <Share />
     </main>
   );
 }

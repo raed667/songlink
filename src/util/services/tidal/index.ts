@@ -6,66 +6,6 @@ import { ResourceType } from "@/util/validators/type";
 class Tidal {
   public static _name: "tidal";
 
-  static async search(type: ResourceType, params: SearchParams, market = "US") {
-    return await backOff(() => Tidal._search(type, params, market), {
-      numOfAttempts: 5,
-      maxDelay: 3500,
-    });
-  }
-
-  static async _search(
-    type: ResourceType,
-    params: SearchParams,
-    market = "US"
-  ): Promise<SearchResult | null> {
-    const token = await this.getAuthToken();
-    const q = new URLSearchParams();
-    let query = "";
-    if (params.track_name) query += params.track_name;
-    if (params.artist_name) query += " " + params.artist_name;
-    if (params.album_name) query += " " + params.album_name;
-    q.set("query", query);
-    q.set("countryCode", market);
-    q.set("limit", "1");
-
-    const response = await fetch(
-      `https://openapi.tidal.com/search?${q.toString()}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/vnd.tidal.v1+json",
-        },
-      }
-    );
-    const result = await response.json();
-
-    if (type === "artist" && result?.artists?.length > 0) {
-      const item = result.artists[0]?.resource;
-      const key = this.getKey(item.id, "artist");
-      const value = this.parseArtist(key, item);
-      await kv.set(key, JSON.stringify(value));
-      return value;
-    }
-
-    if (type === "album" && result?.albums?.length > 0) {
-      const item = result.albums[0]?.resource;
-      const key = this.getKey(item.id, "album");
-      const value = this.parseAlbum(key, item);
-      await kv.set(key, JSON.stringify(value));
-      return value;
-    }
-
-    if (type === "track" && result?.tracks?.length > 0) {
-      const item = result.tracks[0]?.resource;
-      const key = this.getKey(item.id, "track");
-      const value = this.parseTrack(key, item);
-      await kv.set(key, JSON.stringify(value));
-      return value;
-    }
-
-    return null;
-  }
-
   private static async getAuthToken(): Promise<string> {
     const token = await kv.get("tidal_access_token");
     if (token) return String(token);

@@ -3,7 +3,6 @@
 import { sql } from "@vercel/postgres";
 import { log } from "next-axiom";
 import { Provider, ResourceType } from "../validators/type";
-import { isSupportedProvider, isSupportedType } from "../validators";
 import spotify from "./spotify";
 import deezer from "./deezer";
 import appleMusic from "./appleMusic";
@@ -11,7 +10,6 @@ import tidal from "./tidal";
 import youtubeMusic from "./youtubeMusic";
 import { SearchResult } from "./type";
 import { cleanTitle } from "./helpers/clean";
-// export const maxDuration = 60;
 
 export const findSourceItem = async (
   id: string,
@@ -74,6 +72,7 @@ export const findRelatedItems = async (
   };
 
   const { rows } = await isSavedRelationship(source.key, source.provider);
+
   const cachedKeys = rows[0] ?? {};
 
   if (source.provider !== "spotify") {
@@ -82,12 +81,6 @@ export const findRelatedItems = async (
       services.push({
         service: "spotify",
         method: "getById",
-      });
-    } else {
-      promises.push(spotify.search(type, searchParams));
-      services.push({
-        service: "spotify",
-        method: "search",
       });
     }
   }
@@ -99,12 +92,6 @@ export const findRelatedItems = async (
         service: "appleMusic",
         method: "getById",
       });
-    } else {
-      promises.push(appleMusic.search(type, searchParams));
-      services.push({
-        service: "appleMusic",
-        method: "search",
-      });
     }
   }
 
@@ -115,12 +102,6 @@ export const findRelatedItems = async (
         service: "deezer",
         method: "getById",
       });
-    } else {
-      promises.push(deezer.search(type, searchParams));
-      services.push({
-        service: "deezer",
-        method: "search",
-      });
     }
   }
 
@@ -128,9 +109,6 @@ export const findRelatedItems = async (
     if (cachedKeys["tidal"]) {
       promises.push(getSourceItemByKey(cachedKeys["tidal"]));
       services.push({ service: "tidal", method: "getById" });
-    } else {
-      promises.push(tidal.search(type, searchParams));
-      services.push({ service: "tidal", method: "search" });
     }
   }
 
@@ -138,9 +116,6 @@ export const findRelatedItems = async (
     if (cachedKeys["youtubemusic"]) {
       promises.push(getSourceItemByKey(cachedKeys["youtubemusic"]));
       services.push({ service: "youtubeMusic", method: "getById" });
-    } else {
-      promises.push(youtubeMusic.search(type, searchParams));
-      services.push({ service: "youtubeMusic", method: "search" });
     }
   }
 
@@ -150,9 +125,6 @@ export const findRelatedItems = async (
     if (result.status === "fulfilled" && result.value) {
       const { provider, key } = result.value;
       keys[provider] = key;
-      if (cachedKeys && !cachedKeys[provider.toLowerCase()]) {
-        await appendKey(cachedKeys.id, provider, key);
-      }
     } else {
       const { service, method } = services[idx];
       log.error("Error finding related items", {
@@ -163,21 +135,17 @@ export const findRelatedItems = async (
       });
     }
   });
-  if (
-    Object.values(cachedKeys).length === 0 &&
-    Object.values(keys).length > 1
-  ) {
-    try {
-      await saveOrUpdateRelatedKeys(keys);
-    } catch (error) {
-      log.error("Error saving key relations", {
-        keys,
-        error,
-      });
-    }
-  }
-  await log.flush();
+
   return results;
+};
+
+const isSupportedProvider = (provider: string): provider is Provider =>
+  ["spotify", "appleMusic", "deezer", "tidal", "youtubeMusic"].includes(
+    provider
+  );
+
+const isSupportedType = (type: string): type is ResourceType => {
+  return type === "track" || type === "album" || type === "artist";
 };
 
 export const getSourceItemByKey = async (key: string) => {
@@ -194,75 +162,18 @@ export const getSourceItemByKey = async (key: string) => {
   return findSourceItem(id, type, provider);
 };
 
-const saveOrUpdateRelatedKeys = async (keys: Record<string, string>) => {
-  const ids = await Promise.all(
-    Object.entries(keys).map(async ([provider, key]) => {
-      const { rows } = await isSavedRelationship(key, provider as Provider);
-      const cachedKeys = rows[0] ?? {};
-      if (cachedKeys.id) {
-        return cachedKeys.id as number;
-      }
-    })
-  );
-
-  const uniqueIds = Array.from(
-    new Set(ids.filter((id): id is number => id !== undefined))
-  );
-
-  if (uniqueIds.length > 1) {
-    throw new Error(
-      `Database inconsistency, found multiple matches for the same row: ${uniqueIds.join(
-        ","
-      )}`
-    );
-  }
-
-  const id = uniqueIds.at(0);
-
-  if (id === undefined) {
-    return await saveRelatedKeys(keys);
-  } else {
-    return await updateRelatedKeys(id, keys);
-  }
-};
-
-const saveRelatedKeys = async (keys: Record<string, string>) => {
-  return sql`INSERT INTO relationship_cache (spotify, deezer, applemusic, tidal, youtubemusic) VALUES (${keys.spotify}, ${keys.deezer}, ${keys.appleMusic}, ${keys.tidal}, ${keys.youtubeMusic})`;
-};
-
-const updateRelatedKeys = async (id: number, keys: Record<string, string>) => {
-  return sql`UPDATE relationship_cache SET spotify=${keys.spotify}, deezer=${keys.deezer}, applemusic=${keys.appleMusic}, tidal=${keys.tidal}, youtubemusic=${keys.youtubeMusic} WHERE id=${id}`;
-};
-
 const isSavedRelationship = async (key: string, provider: Provider) => {
   switch (provider) {
     case "appleMusic":
-      return sql`SELECT * FROM relationship_cache WHERE applemusic=${key};`;
+      return sql`SELECT * FROM relationship_cache WHERE applemusic like ${key};`;
     case "spotify":
-      return sql`SELECT * FROM relationship_cache WHERE spotify=${key};`;
+      return sql`SELECT * FROM relationship_cache WHERE spotify like ${key};`;
     case "deezer":
-      return sql`SELECT * FROM relationship_cache WHERE deezer=${key};`;
+      return sql`SELECT * FROM relationship_cache WHERE deezer like ${key};`;
     case "tidal":
-      return sql`SELECT * FROM relationship_cache WHERE tidal=${key};`;
+      return sql`SELECT * FROM relationship_cache WHERE tidal like ${key};`;
     case "youtubeMusic":
-      return sql`SELECT * FROM relationship_cache WHERE youtubemusic=${key};`;
-    default:
-      throw new Error(`Provider "${provider}" not supported`);
-  }
-};
-
-const appendKey = async (id: string, provider: Provider, key: string) => {
-  switch (provider) {
-    case "appleMusic":
-      return sql`UPDATE relationship_cache SET applemusic=${key} WHERE id=${id};`;
-    case "spotify":
-      return sql`UPDATE relationship_cache SET spotify=${key} WHERE id=${id};`;
-    case "deezer":
-      return sql`UPDATE relationship_cache SET deezer=${key} WHERE id=${id};`;
-    case "tidal":
-      return sql`UPDATE relationship_cache SET tidal=${key} WHERE id=${id};`;
-    case "youtubeMusic":
-      return sql`UPDATE relationship_cache SET youtubemusic=${key} WHERE id=${id};`;
+      return sql`SELECT * FROM relationship_cache WHERE youtubemusic like ${key};`;
     default:
       throw new Error(`Provider "${provider}" not supported`);
   }
