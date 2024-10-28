@@ -13,7 +13,11 @@ export default function Home() {
         >
           Apr 2, 2025
         </a>
-        .
+        <br />
+        You can use{" "}
+        <a className="text-blue-500" href="https://odesli.co/">
+          odesli.co
+        </a>{" "}
       </div>
     </main>
   );
